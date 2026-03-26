@@ -69,7 +69,9 @@ Full SWL tables for:
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/liftplan-pro.git
+git clone https://github.com/MGalal01/LiftingPlan-Pro.git
+
+🌐 Live demo: https://mgalal01.github.io/LiftingPlan-Pro/
 cd liftplan-pro
 
 # Install dependencies
@@ -210,5 +212,4 @@ MIT Licence — free to use, modify and distribute. Attribution appreciated.
 
 - 🏗️ [LEEA — Lifting Equipment Engineers Association](https://leea.org.uk)
 - 📋 [HSE LOLER Guidance](https://www.hse.gov.uk/work-equipment-machinery/loler.htm)
-- 💬 Open an [Issue](https://github.com/YOUR_USERNAME/liftplan-pro/issues) for bugs or feature requests
 - ⭐ Star the repo if you find it useful — it helps other lifting engineers find it!
