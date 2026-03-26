@@ -4,684 +4,1863 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LiftPlan Pro — LEEA Lifting Operations Portal</title>
-  <meta name="description" content="Free, open-source LEEA-compliant lifting plan portal for Appointed Persons, riggers and lifting engineers." />
-
-  <!-- Open Graph for LinkedIn preview -->
-  <meta property="og:title" content="LiftPlan Pro — LEEA Lifting Operations Portal" />
-  <meta property="og:description" content="Free open-source lifting plan wizard, crane database, LEEA accessories library and AI crane data sheet analyser." />
-  <meta property="og:type" content="website" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
-
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --navy:    #0d1b2e;
-      --navy2:   #121f35;
-      --navy3:   #1a2d4a;
-      --border:  #1e3a5f;
-      --yellow:  #f5c300;
-      --yellow2: #ffd740;
-      --cyan:    #22d3ee;
-      --green:   #2ecc71;
-      --red:     #ef4444;
-      --text:    #e2e8f0;
-      --muted:   #64748b;
-      --subtle:  #94a3b8;
-      --fd: 'Barlow Condensed', sans-serif;
-      --fb: 'Barlow', sans-serif;
-      --fm: 'JetBrains Mono', monospace;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--navy);
-      color: var(--text);
-      font-family: var(--fb);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── GRID BACKGROUND ── */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(30,58,95,0.35) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(30,58,95,0.35) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ── NAV ── */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(13,27,46,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 2px solid var(--yellow);
-      padding: 0 40px;
-      height: 60px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .nav-logo {
-      display: flex; align-items: center; gap: 12px;
-      font-family: var(--fd); font-weight: 800; font-size: 20px;
-      color: var(--yellow); letter-spacing: 2px; text-transform: uppercase;
-      text-decoration: none;
-    }
-    .nav-logo-icon {
-      width: 36px; height: 36px; background: var(--yellow);
-      border-radius: 5px; display: flex; align-items: center; justify-content: center;
-      font-size: 18px; font-weight: 900; color: var(--navy);
-    }
-    .nav-links { display: flex; gap: 8px; align-items: center; }
-    .nav-link {
-      color: var(--muted); font-family: var(--fd); font-size: 13px;
-      font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-      text-decoration: none; padding: 6px 12px; border-radius: 4px;
-      transition: color .15s;
-    }
-    .nav-link:hover { color: var(--yellow); }
-    .nav-cta {
-      background: var(--yellow); color: var(--navy);
-      font-family: var(--fd); font-size: 13px; font-weight: 800;
-      letter-spacing: 2px; text-transform: uppercase;
-      padding: 8px 20px; border-radius: 4px; text-decoration: none;
-      transition: background .15s, transform .15s;
-    }
-    .nav-cta:hover { background: var(--yellow2); transform: translateY(-1px); }
-
-    /* ── HERO ── */
-    .hero {
-      position: relative; z-index: 1;
-      min-height: 92vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center;
-      padding: 80px 24px 60px;
-      overflow: hidden;
-    }
-
-    /* animated glow rings */
-    .hero::after {
-      content: '';
-      position: absolute;
-      width: 700px; height: 700px;
-      border-radius: 50%;
-      border: 1px solid rgba(245,195,0,0.08);
-      box-shadow: 0 0 80px rgba(245,195,0,0.04) inset;
-      top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      animation: ring-pulse 6s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    @keyframes ring-pulse {
-      0%,100% { transform: translate(-50%,-50%) scale(1); opacity: .6; }
-      50%      { transform: translate(-50%,-50%) scale(1.08); opacity: 1; }
-    }
-
-    .hero-eyebrow {
-      font-family: var(--fm); font-size: 11px; color: var(--cyan);
-      letter-spacing: 4px; text-transform: uppercase;
-      border: 1px solid rgba(34,211,238,0.25);
-      background: rgba(34,211,238,0.06);
-      padding: 5px 16px; border-radius: 20px;
-      margin-bottom: 28px;
-      animation: fadeUp .6s ease forwards;
-    }
-
-    .hero-title {
-      font-family: var(--fd); font-weight: 900;
-      font-size: clamp(52px, 8vw, 100px);
-      line-height: .92;
-      letter-spacing: -1px;
-      color: var(--text);
-      margin-bottom: 8px;
-      animation: fadeUp .6s .1s ease both;
-    }
-    .hero-title span { color: var(--yellow); }
-
-    .hero-sub {
-      font-family: var(--fd); font-size: clamp(18px, 3vw, 28px);
-      font-weight: 600; color: var(--muted);
-      letter-spacing: 3px; text-transform: uppercase;
-      margin-bottom: 28px;
-      animation: fadeUp .6s .2s ease both;
-    }
-
-    .hero-desc {
-      max-width: 640px; font-size: 16px; line-height: 1.7;
-      color: var(--subtle); margin-bottom: 44px;
-      animation: fadeUp .6s .3s ease both;
-    }
-
-    .hero-btns {
-      display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
-      animation: fadeUp .6s .4s ease both;
-    }
-    .btn-hero-primary {
-      background: var(--yellow); color: var(--navy);
-      font-family: var(--fd); font-size: 16px; font-weight: 800;
-      letter-spacing: 2px; text-transform: uppercase;
-      padding: 16px 36px; border-radius: 5px; text-decoration: none;
-      box-shadow: 0 0 32px rgba(245,195,0,0.25);
-      transition: all .2s;
-    }
-    .btn-hero-primary:hover { background: var(--yellow2); transform: translateY(-2px); box-shadow: 0 0 48px rgba(245,195,0,0.4); }
-
-    .btn-hero-ghost {
-      background: transparent; color: var(--subtle);
-      border: 1px solid var(--border);
-      font-family: var(--fd); font-size: 15px; font-weight: 700;
-      letter-spacing: 2px; text-transform: uppercase;
-      padding: 15px 32px; border-radius: 5px; text-decoration: none;
-      transition: all .2s;
-    }
-    .btn-hero-ghost:hover { border-color: var(--yellow); color: var(--yellow); }
-
-    .hero-badges {
-      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
-      margin-top: 52px;
-      animation: fadeUp .6s .5s ease both;
-    }
-    .badge {
-      font-family: var(--fm); font-size: 10px; font-weight: 700;
-      letter-spacing: 2px; text-transform: uppercase;
-      padding: 4px 12px; border-radius: 3px; border: 1px solid;
-    }
-    .badge-yellow { border-color: rgba(245,195,0,0.4); color: var(--yellow); background: rgba(245,195,0,0.06); }
-    .badge-cyan   { border-color: rgba(34,211,238,0.4); color: var(--cyan);   background: rgba(34,211,238,0.06); }
-    .badge-green  { border-color: rgba(46,204,113,0.4); color: var(--green);  background: rgba(46,204,113,0.06); }
-
-    /* ── SECTION COMMONS ── */
-    section { position: relative; z-index: 1; padding: 96px 24px; }
-    .container { max-width: 1100px; margin: 0 auto; }
-    .section-label {
-      font-family: var(--fm); font-size: 11px; color: var(--cyan);
-      letter-spacing: 4px; text-transform: uppercase; margin-bottom: 14px;
-    }
-    .section-title {
-      font-family: var(--fd); font-size: clamp(32px,5vw,54px);
-      font-weight: 800; line-height: 1; margin-bottom: 16px; color: var(--text);
-    }
-    .section-title span { color: var(--yellow); }
-    .section-desc { font-size: 16px; color: var(--subtle); max-width: 560px; line-height: 1.7; }
-
-    /* ── FEATURES ── */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px; margin-top: 56px;
-    }
-    .feature-card {
-      background: var(--navy2);
-      border: 1px solid var(--border);
-      border-radius: 10px; padding: 28px;
-      transition: border-color .2s, transform .2s;
-      position: relative; overflow: hidden;
-    }
-    .feature-card::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, var(--yellow), transparent);
-      opacity: 0; transition: opacity .2s;
-    }
-    .feature-card:hover { border-color: rgba(245,195,0,0.4); transform: translateY(-4px); }
-    .feature-card:hover::before { opacity: 1; }
-    .feature-icon { font-size: 32px; margin-bottom: 16px; }
-    .feature-title {
-      font-family: var(--fd); font-size: 20px; font-weight: 700;
-      color: var(--yellow); letter-spacing: 1px; margin-bottom: 10px;
-    }
-    .feature-desc { font-size: 14px; color: var(--subtle); line-height: 1.6; }
-    .feature-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
-    .feature-tag {
-      font-family: var(--fm); font-size: 9px; font-weight: 700;
-      letter-spacing: 1px; text-transform: uppercase;
-      padding: 2px 8px; border-radius: 2px;
-      background: rgba(245,195,0,0.08); color: var(--yellow);
-      border: 1px solid rgba(245,195,0,0.2);
-    }
-
-    /* ── STANDARDS ── */
-    .standards-section { background: var(--navy2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .standards-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
-      gap: 14px; margin-top: 48px;
-    }
-    .std-card {
-      background: var(--navy); border: 1px solid var(--border);
-      border-radius: 8px; padding: 20px;
-      display: flex; align-items: flex-start; gap: 14px;
-    }
-    .std-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); flex-shrink: 0; margin-top: 5px; }
-    .std-name { font-family: var(--fd); font-size: 15px; font-weight: 700; color: var(--yellow); margin-bottom: 3px; }
-    .std-desc { font-size: 12px; color: var(--muted); font-family: var(--fm); }
-
-    /* ── CRANES ── */
-    .crane-table-wrap { margin-top: 48px; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th {
-      background: var(--navy3); color: var(--yellow);
-      font-family: var(--fd); font-size: 11px; font-weight: 700;
-      letter-spacing: 2px; text-transform: uppercase;
-      padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border);
-    }
-    td { padding: 12px 16px; border-bottom: 1px solid rgba(30,58,95,0.5); color: var(--subtle); }
-    tr:hover td { background: rgba(30,58,95,0.3); }
-    .td-name { color: var(--text); font-weight: 600; }
-    .td-swl { color: var(--cyan); font-family: var(--fm); font-weight: 700; }
-    .type-badge {
-      font-family: var(--fm); font-size: 9px; font-weight: 700;
-      letter-spacing: 1px; text-transform: uppercase;
-      padding: 2px 7px; border-radius: 2px;
-      background: rgba(245,195,0,0.1); color: var(--yellow);
-      border: 1px solid rgba(245,195,0,0.25);
-    }
-
-    /* ── CONTRIBUTE ── */
-    .contribute-section { text-align: center; }
-    .contribute-box {
-      background: var(--navy2);
-      border: 1px solid var(--border);
-      border-top: 3px solid var(--yellow);
-      border-radius: 12px;
-      padding: 64px 48px;
-      margin-top: 56px;
-      position: relative; overflow: hidden;
-    }
-    .contribute-box::before {
-      content: '';
-      position: absolute; bottom: -60px; right: -60px;
-      width: 250px; height: 250px; border-radius: 50%;
-      background: rgba(245,195,0,0.03);
-      border: 40px solid rgba(245,195,0,0.04);
-    }
-    .contribute-title {
-      font-family: var(--fd); font-size: clamp(28px,5vw,48px);
-      font-weight: 900; color: var(--text); margin-bottom: 16px; line-height: 1;
-    }
-    .contribute-desc { font-size: 16px; color: var(--subtle); max-width: 540px; margin: 0 auto 36px; line-height: 1.7; }
-    .contribute-ways {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
-      gap: 12px; margin-bottom: 40px; text-align: left;
-    }
-    .way-item {
-      background: var(--navy); border: 1px solid var(--border);
-      border-radius: 8px; padding: 16px 18px;
-      display: flex; align-items: flex-start; gap: 10px;
-    }
-    .way-icon { font-size: 20px; flex-shrink: 0; }
-    .way-text { font-size: 13px; color: var(--subtle); line-height: 1.5; }
-    .way-text strong { display: block; color: var(--text); font-family: var(--fd); font-size: 15px; font-weight: 700; margin-bottom: 2px; }
-
-    .contribute-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-    .btn-github {
-      background: var(--yellow); color: var(--navy);
-      font-family: var(--fd); font-size: 15px; font-weight: 800;
-      letter-spacing: 2px; text-transform: uppercase;
-      padding: 14px 32px; border-radius: 5px; text-decoration: none;
-      transition: all .2s; display: flex; align-items: center; gap: 8px;
-    }
-    .btn-github:hover { background: var(--yellow2); transform: translateY(-2px); }
-    .btn-issue {
-      background: transparent; color: var(--subtle);
-      border: 1px solid var(--border);
-      font-family: var(--fd); font-size: 14px; font-weight: 700;
-      letter-spacing: 2px; text-transform: uppercase;
-      padding: 13px 28px; border-radius: 5px; text-decoration: none;
-      transition: all .2s; display: flex; align-items: center; gap: 8px;
-    }
-    .btn-issue:hover { border-color: var(--cyan); color: var(--cyan); }
-
-    /* ── AUTHOR ── */
-    .author-section { border-top: 1px solid var(--border); }
-    .author-card {
-      background: var(--navy2); border: 1px solid var(--border);
-      border-radius: 12px; padding: 40px 48px;
-      display: flex; align-items: center; gap: 40px;
-      flex-wrap: wrap;
-    }
-    .author-avatar {
-      width: 80px; height: 80px; border-radius: 50%;
-      background: var(--yellow); display: flex; align-items: center;
-      justify-content: center; font-family: var(--fd); font-size: 32px;
-      font-weight: 900; color: var(--navy); flex-shrink: 0;
-      box-shadow: 0 0 0 4px rgba(245,195,0,0.2);
-    }
-    .author-info { flex: 1; min-width: 200px; }
-    .author-name { font-family: var(--fd); font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
-    .author-role { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
-    .author-certs { display: flex; gap: 8px; flex-wrap: wrap; }
-    .cert-tag {
-      font-family: var(--fm); font-size: 10px; font-weight: 700;
-      letter-spacing: 1px; text-transform: uppercase;
-      padding: 3px 10px; border-radius: 3px;
-      background: rgba(245,195,0,0.1); color: var(--yellow);
-      border: 1px solid rgba(245,195,0,0.25);
-    }
-    .author-links { display: flex; gap: 10px; flex-wrap: wrap; }
-    .author-link {
-      font-family: var(--fd); font-size: 13px; font-weight: 700;
-      letter-spacing: 1px; text-transform: uppercase;
-      padding: 8px 18px; border-radius: 4px; text-decoration: none;
-      border: 1px solid var(--border); color: var(--muted);
-      transition: all .2s;
-    }
-    .author-link:hover { border-color: var(--yellow); color: var(--yellow); }
-
-    /* ── DISCLAIMER ── */
-    .disclaimer {
-      background: rgba(239,68,68,0.04);
-      border: 1px solid rgba(239,68,68,0.2);
-      border-left: 3px solid var(--red);
-      border-radius: 6px; padding: 16px 20px;
-      font-family: var(--fm); font-size: 11px; color: rgba(239,68,68,0.8);
-      line-height: 1.6; margin-top: 48px;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 24px 40px;
-      display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: 12px;
-      position: relative; z-index: 1;
-    }
-    .footer-left { font-family: var(--fm); font-size: 10px; color: var(--muted); letter-spacing: 2px; }
-    .footer-right { display: flex; gap: 6px; }
-    .footer-badge {
-      font-family: var(--fm); font-size: 9px; font-weight: 700;
-      letter-spacing: 1px; text-transform: uppercase;
-      padding: 3px 8px; border-radius: 2px; border: 1px solid var(--border); color: var(--muted);
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      nav { padding: 0 20px; }
-      .nav-links { display: none; }
-      section { padding: 64px 20px; }
-      .contribute-box { padding: 40px 24px; }
-      .author-card { padding: 28px 24px; }
-      footer { flex-direction: column; text-align: center; }
-    }
-  </style>
+  <meta name="description" content="LEEA-compliant lifting plan portal for Appointed Persons and lifting engineers. LOLER 1998 · BS 7121." />
 </head>
 <body>
+  <div id="root"></div>
 
-  <!-- NAV -->
-  <nav>
-    <a href="#" class="nav-logo">
-      <div class="nav-logo-icon">AP</div>
-      LiftPlan Pro
-    </a>
-    <div class="nav-links">
-      <a href="#features"   class="nav-link">Features</a>
-      <a href="#standards"  class="nav-link">Standards</a>
-      <a href="#cranes"     class="nav-link">Crane DB</a>
-      <a href="#contribute" class="nav-link">Contribute</a>
-      <a href="https://github.com/YOUR_USERNAME/liftplan-pro" target="_blank" class="nav-cta">⭐ Star on GitHub</a>
-    </div>
-  </nav>
+  <!-- React + Babel via CDN — no install needed -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-eyebrow">Open Source · Free Forever · Built for the Industry</div>
-    <h1 class="hero-title">
-      Lift<span>Plan</span><br>Pro
-    </h1>
-    <p class="hero-sub">LEEA Lifting Operations Portal</p>
-    <p class="hero-desc">
-      A professional, LOLER-compliant lifting plan management system built for
-      Appointed Persons, riggers and lifting engineers — with a built-in crane database,
-      LEEA accessories library and AI-powered data sheet analyser.
-    </p>
-    <div class="hero-btns">
-      <a href="https://github.com/YOUR_USERNAME/liftplan-pro" target="_blank" class="btn-hero-primary">
-        ⭐ View on GitHub
-      </a>
-      <a href="https://liftplan-pro.vercel.app" target="_blank" class="btn-hero-ghost">
-        🌐 Live Demo →
-      </a>
-    </div>
-    <div class="hero-badges">
-      <span class="badge badge-yellow">LOLER 1998</span>
-      <span class="badge badge-yellow">BS 7121</span>
-      <span class="badge badge-yellow">LEEA Compliant</span>
-      <span class="badge badge-cyan">EN 13414 · EN 818</span>
-      <span class="badge badge-cyan">EN 1492 · EN 13889</span>
-      <span class="badge badge-green">MIT Licence · Free</span>
-    </div>
-  </section>
+  <script type="text/babel" data-presets="react">
+    const { useState, useRef, useCallback, useEffect } = React;
 
-  <!-- FEATURES -->
-  <section id="features">
-    <div class="container">
-      <div class="section-label">What's inside</div>
-      <h2 class="section-title">Everything an <span>AP needs</span><br>on one screen</h2>
-      <p class="section-desc">From first risk assessment to final digital sign-off — built to the exact standards you work to every day.</p>
 
-      <div class="features-grid">
+// ─── GLOBAL STYLES ────────────────────────────────────────────────────────────
+const globalStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #1B2A4A; --navy-light: #243659; --navy-dark: #121D33; --navy-mid: #1e3060;
+    --yellow: #F5C300; --yellow-dark: #d4a800; --yellow-light: #FFD740;
+    --white: #FFFFFF; --off-white: #F4F5F7; --gray-100: #EEF0F4;
+    --gray-200: #D8DCE6; --gray-400: #8C95A8; --gray-600: #556070;
+    --green: #2ECC71; --green-dark: #27AE60; --amber: #F39C12;
+    --red: #E74C3C; --red-dark: #C0392B; --critical: #8B0000;
+    --dark-bg: #060d1a; --dark-card: #07111f; --dark-border: #1e3a5f;
+    --dark-border2: #1e3a5f; --cyan: #22d3ee;
+    --font-display: 'Barlow Condensed', sans-serif;
+    --font-body: 'Barlow', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+  body { font-family: var(--font-body); background: var(--off-white); color: var(--navy); }
+  .app-root { min-height: 100vh; display: flex; flex-direction: column; }
+  .app-header { background: var(--navy-dark); padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--yellow); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+  .header-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .header-logo-icon { width: 36px; height: 36px; background: var(--yellow); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 900; font-size: 18px; color: var(--navy-dark); }
+  .header-logo-text { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--white); letter-spacing: 1px; text-transform: uppercase; }
+  .header-logo-sub { font-size: 11px; color: var(--gray-400); letter-spacing: 2px; text-transform: uppercase; }
+  .plan-ref-badge { background: var(--navy); border: 1px solid var(--navy-light); color: var(--yellow); padding: 4px 12px; border-radius: 3px; font-size: 13px; font-weight: 700; font-family: var(--font-display); letter-spacing: 1px; }
+  .save-status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--gray-400); }
+  .save-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+  .header-nav { display: flex; gap: 4px; flex-wrap: wrap; }
+  .header-nav-btn { background: none; border: none; cursor: pointer; color: var(--gray-400); font-family: var(--font-display); font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 6px 10px; border-radius: 3px; transition: all 0.15s; white-space: nowrap; }
+  .header-nav-btn:hover, .header-nav-btn.active { color: var(--yellow); }
+  .header-nav-sep { width: 1px; background: rgba(255,255,255,0.1); margin: 8px 4px; }
+  .dashboard { padding: 32px; max-width: 1400px; margin: 0 auto; width: 100%; }
+  .dashboard-hero { background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy-mid) 60%, #1a3a6e 100%); border-radius: 8px; padding: 40px 48px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; position: relative; overflow: hidden; border-bottom: 4px solid var(--yellow); }
+  .dashboard-hero::before { content: ''; position: absolute; right: -40px; top: -40px; width: 300px; height: 300px; border-radius: 50%; background: rgba(245,195,0,0.04); border: 40px solid rgba(245,195,0,0.06); }
+  .hero-greeting { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--yellow); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+  .hero-name { font-family: var(--font-display); font-size: 42px; font-weight: 800; color: var(--white); line-height: 1; margin-bottom: 6px; }
+  .hero-role { font-size: 15px; color: var(--gray-400); }
+  .hero-cert { font-family: var(--font-display); font-size: 12px; color: var(--yellow); margin-top: 8px; letter-spacing: 2px; }
+  .hero-cta { display: flex; flex-direction: column; gap: 12px; z-index: 1; }
+  .btn-primary { background: var(--yellow); color: var(--navy-dark); border: none; cursor: pointer; font-family: var(--font-display); font-size: 16px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; padding: 14px 32px; border-radius: 4px; transition: all 0.2s; box-shadow: 0 4px 15px rgba(245,195,0,0.3); }
+  .btn-primary:hover { background: var(--yellow-light); transform: translateY(-2px); }
+  .btn-secondary { background: transparent; color: var(--gray-400); border: 1px solid rgba(255,255,255,0.15); cursor: pointer; font-family: var(--font-display); font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 10px 24px; border-radius: 4px; transition: all 0.2s; text-align: center; }
+  .btn-secondary:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: var(--white); border-radius: 6px; padding: 20px 24px; border-left: 4px solid transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.2s; }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .stat-card.yellow { border-left-color: var(--yellow); }
+  .stat-card.green { border-left-color: var(--green); }
+  .stat-card.amber { border-left-color: var(--amber); }
+  .stat-card.navy { border-left-color: var(--navy); }
+  .stat-label { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: var(--gray-400); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .stat-value { font-family: var(--font-display); font-size: 36px; font-weight: 800; color: var(--navy); line-height: 1; }
+  .stat-sub { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
+  .section-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--navy); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .section-title::after { content: ''; flex: 1; height: 2px; background: var(--gray-200); }
+  .plans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+  .plan-card { background: var(--white); border-radius: 6px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+  .plan-card:hover { border-color: var(--yellow); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .plan-card-ref { font-family: var(--font-display); font-size: 11px; color: var(--gray-400); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  .plan-card-name { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  .plan-card-meta { font-size: 13px; color: var(--gray-600); margin-bottom: 12px; }
+  .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+  .status-badge.approved { background: rgba(46,204,113,0.12); color: var(--green-dark); }
+  .status-badge.draft { background: rgba(243,156,18,0.12); color: var(--amber); }
+  .status-badge.completed { background: rgba(27,42,74,0.08); color: var(--navy); }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .wizard-container { max-width: 1100px; margin: 0 auto; padding: 24px 32px; width: 100%; }
+  .wizard-progress { background: var(--white); border-radius: 6px; padding: 20px 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .progress-steps { display: flex; align-items: center; }
+  .progress-step { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; cursor: pointer; }
+  .progress-step::after { content: ''; position: absolute; top: 14px; left: 50%; width: 100%; height: 2px; background: var(--gray-200); z-index: 0; }
+  .progress-step:last-child::after { display: none; }
+  .progress-step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--gray-200); border: 3px solid var(--gray-200); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 12px; font-weight: 700; color: var(--gray-400); z-index: 1; position: relative; transition: all 0.3s; }
+  .progress-step.active .progress-step-dot { background: var(--yellow); border-color: var(--yellow); color: var(--navy-dark); box-shadow: 0 0 0 4px rgba(245,195,0,0.2); }
+  .progress-step.done .progress-step-dot { background: var(--navy); border-color: var(--navy); color: var(--white); }
+  .progress-step.done::after { background: var(--navy); }
+  .progress-step-label { font-family: var(--font-display); font-size: 10px; font-weight: 600; color: var(--gray-400); letter-spacing: 1px; text-transform: uppercase; margin-top: 6px; text-align: center; max-width: 80px; }
+  .progress-step.active .progress-step-label, .progress-step.done .progress-step-label { color: var(--navy); }
+  .wizard-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+  .wizard-card { background: var(--white); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+  .wizard-card-header { background: var(--navy-dark); padding: 20px 28px; display: flex; align-items: center; gap: 16px; border-bottom: 3px solid var(--yellow); }
+  .step-number { width: 40px; height: 40px; background: var(--yellow); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 20px; font-weight: 900; color: var(--navy-dark); }
+  .step-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--white); }
+  .step-subtitle { font-size: 13px; color: var(--gray-400); margin-top: 2px; }
+  .wizard-card-body { padding: 28px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .form-full { grid-column: 1 / -1; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-label { font-family: var(--font-display); font-size: 11px; font-weight: 700; color: var(--gray-600); letter-spacing: 2px; text-transform: uppercase; }
+  .form-label .required { color: var(--red); }
+  .form-input { background: var(--gray-100); border: 2px solid var(--gray-200); border-radius: 4px; padding: 10px 14px; font-family: var(--font-body); font-size: 14px; color: var(--navy); transition: all 0.15s; outline: none; }
+  .form-input:focus { border-color: var(--yellow); background: var(--white); }
+  .form-input::placeholder { color: var(--gray-400); }
+  .form-select { background: var(--gray-100); border: 2px solid var(--gray-200); border-radius: 4px; padding: 10px 14px; font-family: var(--font-body); font-size: 14px; color: var(--navy); cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238C95A8' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; transition: all 0.15s; }
+  .form-select:focus { border-color: var(--yellow); background-color: var(--white); }
+  .form-textarea { background: var(--gray-100); border: 2px solid var(--gray-200); border-radius: 4px; padding: 10px 14px; font-family: var(--font-body); font-size: 14px; color: var(--navy); resize: vertical; min-height: 80px; transition: all 0.15s; outline: none; }
+  .form-textarea:focus { border-color: var(--yellow); background: var(--white); }
+  .form-section { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--gray-100); }
+  .form-section:last-child { border-bottom: none; margin-bottom: 0; }
+  .form-section-title { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--yellow); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; }
+  .wizard-sidebar { display: flex; flex-direction: column; gap: 16px; }
+  .sidebar-card { background: var(--white); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+  .sidebar-card-header { background: var(--navy); padding: 12px 16px; font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--yellow); letter-spacing: 2px; text-transform: uppercase; }
+  .sidebar-card-body { padding: 16px; }
+  .capacity-bar { height: 10px; background: var(--gray-200); border-radius: 5px; overflow: hidden; margin: 12px 0 8px; }
+  .capacity-fill { height: 100%; border-radius: 5px; transition: all 0.5s ease; }
+  .calc-label { font-size: 11px; color: var(--gray-400); display: block; margin-bottom: 2px; }
+  .personnel-table { width: 100%; border-collapse: collapse; }
+  .personnel-table th { background: var(--navy); color: var(--yellow); font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 10px 12px; text-align: left; }
+  .personnel-table td { padding: 10px 12px; font-size: 13px; border-bottom: 1px solid var(--gray-100); }
+  .personnel-table tr:hover td { background: var(--gray-100); }
+  .hazard-card { background: var(--gray-100); border-radius: 6px; padding: 14px 16px; margin-bottom: 10px; border-left: 4px solid transparent; }
+  .hazard-card.low { border-left-color: var(--green); }
+  .hazard-card.medium { border-left-color: var(--amber); }
+  .hazard-card.high { border-left-color: var(--red); }
+  .hazard-card.critical { border-left-color: var(--critical); background: rgba(139,0,0,0.04); }
+  .hazard-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .risk-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 3px; font-family: var(--font-display); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-left: 8px; }
+  .risk-low { background: rgba(46,204,113,0.15); color: var(--green-dark); }
+  .risk-medium { background: rgba(243,156,18,0.15); color: var(--amber); }
+  .risk-high { background: rgba(231,76,60,0.15); color: var(--red-dark); }
+  .risk-critical { background: rgba(139,0,0,0.1); color: var(--critical); }
+  .method-step { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--gray-100); }
+  .method-step-num { width: 32px; height: 32px; background: var(--navy); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--yellow); flex-shrink: 0; }
+  .method-step-tag { font-family: var(--font-display); font-size: 10px; color: var(--gray-400); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+  .method-step-text { font-size: 14px; color: var(--navy); line-height: 1.5; }
+  .review-section { margin-bottom: 20px; border: 1px solid var(--gray-200); border-radius: 6px; overflow: hidden; }
+  .review-section-header { background: var(--navy); padding: 10px 16px; font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--yellow); letter-spacing: 2px; text-transform: uppercase; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .review-section-body { padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .review-field-label { font-size: 11px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 1px; }
+  .review-field-value { font-size: 14px; color: var(--navy); font-weight: 500; }
+  .sig-block { border: 2px dashed var(--gray-200); border-radius: 6px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
+  .sig-block:hover { border-color: var(--yellow); background: rgba(245,195,0,0.04); }
+  .sig-block.signed { border-style: solid; border-color: var(--green); background: rgba(46,204,113,0.05); }
+  .sig-name { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--navy); font-style: italic; }
+  .wizard-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 28px; border-top: 2px solid var(--gray-100); background: var(--off-white); }
+  .btn-nav { display: flex; align-items: center; gap: 8px; padding: 10px 24px; border-radius: 4px; cursor: pointer; font-family: var(--font-display); font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; border: none; transition: all 0.2s; }
+  .btn-nav.prev { background: var(--gray-200); color: var(--gray-600); }
+  .btn-nav.prev:hover { background: var(--gray-400); color: var(--white); }
+  .btn-nav.next { background: var(--yellow); color: var(--navy-dark); }
+  .btn-nav.next:hover { background: var(--yellow-light); }
+  .btn-nav.finish { background: var(--navy); color: var(--yellow); }
+  .equip-options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .equip-option { padding: 6px 14px; border-radius: 4px; border: 2px solid var(--gray-200); font-family: var(--font-display); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; color: var(--gray-600); }
+  .equip-option.selected { border-color: var(--yellow); background: rgba(245,195,0,0.1); color: var(--navy); }
+  .equip-option:hover { border-color: var(--gray-400); color: var(--navy); }
+  .equip-cat-title { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: var(--gray-600); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--gray-200); }
+  .checklist-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--gray-100); cursor: pointer; }
+  .checklist-item:last-child { border-bottom: none; }
+  .check-box { width: 20px; height: 20px; border: 2px solid var(--gray-300,#ccc); border-radius: 3px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .check-box.checked { background: var(--green); border-color: var(--green); }
+  .check-text { font-size: 13px; color: var(--navy); flex: 1; }
+  .check-text.checked { text-decoration: line-through; color: var(--gray-400); }
+  .weather-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .weather-item { flex: 1; min-width: 80px; background: var(--gray-100); border-radius: 6px; padding: 10px 12px; text-align: center; }
+  .weather-value { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--navy); }
+  .weather-label { font-size: 10px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 1px; }
+  .weather-flag { padding: 6px 12px; border-radius: 4px; font-family: var(--font-display); font-size: 12px; font-weight: 700; text-align: center; margin-top: 8px; }
+  .weather-flag.ok { background: rgba(46,204,113,0.1); color: var(--green-dark); }
+  .weather-flag.warn { background: rgba(243,156,18,0.1); color: var(--amber); }
+  .weather-flag.danger { background: rgba(231,76,60,0.1); color: var(--red); }
+  .alert { padding: 12px 16px; border-radius: 4px; font-size: 13px; margin-bottom: 12px; }
+  .alert-yellow { background: rgba(245,195,0,0.12); border-left: 3px solid var(--yellow); color: #7a6200; }
+  .alert-red { background: rgba(231,76,60,0.1); border-left: 3px solid var(--red); color: var(--red-dark); }
+  .alert-green { background: rgba(46,204,113,0.1); border-left: 3px solid var(--green); color: var(--green-dark); }
+  .info-tag { display: inline-flex; align-items: center; background: rgba(27,42,74,0.08); color: var(--navy); padding: 3px 8px; border-radius: 3px; font-size: 12px; margin: 2px; }
+  .scrollable { max-height: 360px; overflow-y: auto; padding-right: 4px; }
+  .scrollable::-webkit-scrollbar { width: 4px; }
+  .scrollable::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 2px; }
+  .lift-zone-svg { width: 100%; border-radius: 6px; border: 2px solid var(--gray-200); }
+  /* Dark panel styles for LEEA tabs */
+  .dark-panel { background: var(--dark-bg); min-height: calc(100vh - 56px); color: #e2e8f0; font-family: var(--font-mono); }
+  .dark-tab-bar { background: #07111f; border-bottom: 1px solid var(--dark-border); display: flex; gap: 0; }
+  .dark-tab-btn { border: none; cursor: pointer; padding: 14px 24px; font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: 2px; transition: all 0.2s; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .dark-tab-btn.active { background: var(--dark-bg); color: #f59e0b; border-bottom-color: #f59e0b; }
+  .dark-tab-btn:not(.active) { background: transparent; color: #64748b; }
+  .dark-tab-btn:hover:not(.active) { background: #0d2240; }
+  .dark-content { padding: 24px 28px; max-width: 1200px; }
+  .dark-card { background: #07111f; border: 1px solid var(--dark-border); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+  .dark-card-header { padding: 12px 18px; border-bottom: 1px solid var(--dark-border); display: flex; justify-content: space-between; align-items: center; }
+  .dark-section-label { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #f59e0b; letter-spacing: 3px; }
+  .dark-stat { background: #080f1e; border: 1px solid var(--dark-border); border-radius: 8px; padding: 14px 16px; }
+  .dark-stat-label { font-size: 9px; color: #475569; letter-spacing: 2px; margin-bottom: 6px; }
+  .dark-stat-value { font-size: 14px; font-weight: 700; color: #e2e8f0; }
+  .acc-pill { border: 1px solid var(--dark-border); cursor: pointer; transition: all 0.15s; border-radius: 6px; padding: 8px 16px; font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: 1px; }
+  .acc-pill.active { background: #0d2240; color: #f59e0b; border-color: #f59e0b; }
+  .acc-pill:not(.active) { background: #07111f; color: #64748b; }
+  .acc-pill:hover:not(.active) { border-color: #f59e0b; }
+  .dark-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .dark-table th { background: #0a1a2e; padding: 10px 14px; color: #64748b; font-weight: 700; font-size: 10px; letter-spacing: 2px; border-bottom: 1px solid var(--dark-border); white-space: nowrap; }
+  .dark-table td { padding: 9px 14px; border-bottom: 1px solid #0d1a2e; transition: background 0.1s; }
+  .dark-table tr:hover td { background: #0d1f35; }
+  .upload-zone { border: 2px dashed var(--dark-border); border-radius: 10px; padding: 44px 24px; text-align: center; cursor: pointer; background: #07111f; transition: all 0.2s; margin-bottom: 24px; }
+  .upload-zone:hover { border-color: #f59e0b; background: #0a1628; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-up { animation: fadeUp 0.3s ease forwards; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .fade-in { animation: fadeIn 0.35s ease forwards; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .pulse { animation: pulse 2s ease-in-out infinite; }
+  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  .spin { animation: spin 1.2s linear infinite; display: inline-block; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #0d1f35; }
+  ::-webkit-scrollbar-thumb { background: #1e4d7a; border-radius: 3px; }
+  @media (max-width: 900px) { .wizard-layout { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr; } .plans-grid { grid-template-columns: 1fr; } .stats-row { grid-template-columns: 1fr 1fr; } .dark-content { padding: 16px; } }
+`;
 
-        <div class="feature-card">
-          <div class="feature-icon">📋</div>
-          <div class="feature-title">8-Step Plan Wizard</div>
-          <div class="feature-desc">Project details, personnel (CPCS/LEEA certs), load & CoG, equipment selection, lift zone, risk matrix, method statement and digital sign-off — all in one guided flow.</div>
-          <div class="feature-tags"><span class="feature-tag">LOLER 1998</span><span class="feature-tag">BS 7121</span><span class="feature-tag">Digital Sign-Off</span></div>
+// ─── CRANE DATABASE ────────────────────────────────────────────────────────────
+const CRANE_DATABASE = {
+  "Liebherr LTM 1500-8.1": {
+    type: "mobile", maxSWL: 500,
+    specs: "8-axle all-terrain mobile crane. Max tip height 188m.",
+    configs: {
+      "55m boom + LLD (8-outrigger full)": { 6:280,8:240,10:200,12:170,14:148,16:128,18:110,20:95,22:82,24:72,26:63,28:55,30:48,34:38,38:30,42:23,46:18,50:14 },
+      "42m boom (8-outrigger full)": { 6:320,8:270,10:220,12:185,14:160,16:138,18:118,20:100,22:86,24:74,26:63,28:54,30:46 },
+      "55m boom (75% outrigger)": { 6:210,8:180,10:150,12:128,14:111,16:96,18:82,20:71,22:61,24:54,26:47,28:41,30:36 },
+    },
+  },
+  "Liebherr LTM 1300-6.2": {
+    type: "mobile", maxSWL: 300,
+    specs: "6-axle all-terrain mobile crane. Max tip height 172m.",
+    configs: {
+      "60m boom (full outrigger)": { 3:300,5:260,6:230,8:190,10:158,12:130,14:108,16:91,18:77,20:65,22:56,24:48,26:41,28:36,30:31,34:23,38:18,42:13,46:10 },
+      "45m boom (full outrigger)": { 3:300,5:270,6:245,8:200,10:168,12:140,14:118,16:100,18:85,20:72,22:62,24:53,26:45,28:39,30:33 },
+    },
+  },
+  "Liebherr LTM 1100-5.2": {
+    type: "mobile", maxSWL: 100,
+    specs: "5-axle all-terrain. Compact city crane for urban sites.",
+    configs: {
+      "52m boom (full outrigger)": { 3:100,4:90,5:80,6:70,8:56,10:44,12:36,14:29,16:24,18:20,20:17,22:14,24:12,26:10,28:8.5,30:7.2 },
+      "35m boom (full outrigger)": { 3:100,4:95,5:88,6:78,8:62,10:50,12:40,14:33,16:27,18:22,20:18 },
+    },
+  },
+  "Liebherr LTM 1090-4.2": {
+    type: "mobile", maxSWL: 90,
+    specs: "4-axle all-terrain. Compact and powerful — 60m main boom. Ideal for congested industrial sites.",
+    configs: {
+      "60m boom (full outrigger)": { 3:90,4:82,5:74,6:66,8:53,10:43,12:35,14:29,16:24,18:20,20:17,22:14.5,24:12.5,26:10.8,28:9.3,30:8.1,34:6.2,38:4.8 },
+      "42m boom (full outrigger)": { 3:90,4:85,5:78,6:70,8:57,10:46,12:38,14:31,16:26,18:22,20:18.5,22:15.8,24:13.5,26:11.6,28:10.0,30:8.7 },
+      "60m boom (75% outrigger)": { 3:67,4:61,5:55,6:49,8:39,10:32,12:26,14:21,16:18,18:15,20:12.7,22:10.9,24:9.4,26:8.1,28:7.0,30:6.1 },
+    },
+  },
+  "Demag AC 50-1": {
+    type: "mobile", maxSWL: 50,
+    specs: "5-axle all-terrain. 50.4m main boom. Compact carrier — excellent manoeuvrability on pipeline corridors.",
+    configs: {
+      "50.4m boom (full outrigger)": { 3:50,4:46,5:41,6:36,8:28,10:22,12:18,14:14.8,16:12.3,18:10.3,20:8.7,22:7.4,24:6.3,26:5.4,28:4.7,30:4.1 },
+      "36m boom (full outrigger)": { 3:50,4:47,5:43,6:39,8:31,10:25,12:20.5,14:17,16:14.2,18:12.0,20:10.2,22:8.7,24:7.5,26:6.5,28:5.6,30:4.9 },
+      "50.4m boom (75% outrigger)": { 3:37,4:34,5:30,6:27,8:21,10:16.5,12:13.5,14:11.1,16:9.2,18:7.7,20:6.5,22:5.6,24:4.7,26:4.1,28:3.5 },
+    },
+  },
+  "Demag AC 300-6": {
+    type: "mobile", maxSWL: 300,
+    specs: "6-axle all-terrain. 60m main boom. DP-winch system.",
+    configs: {
+      "60m boom (full outrigger)": { 3:300,4:270,5:240,6:210,8:172,10:140,12:116,14:97,16:82,18:70,20:60,22:52,24:45,26:39,28:34,30:29,34:22,38:17,42:13,46:10 },
+      "45m boom (full outrigger)": { 3:300,4:280,5:258,6:228,8:188,10:155,12:129,14:108,16:91,18:78,20:67,22:58,24:50,26:43,28:37,30:32 },
+    },
+  },
+  "Demag AC 700-9": {
+    type: "mobile", maxSWL: 700,
+    specs: "9-axle super-lift all-terrain. 84m main boom.",
+    configs: {
+      "84m boom (full outrigger)": { 3:700,5:620,6:555,8:465,10:390,12:328,14:278,16:237,18:204,20:176,22:153,24:134,26:117,28:103,30:91,34:72,38:57,42:45,46:36,50:29 },
+    },
+  },
+  "Liebherr LG 1750 (Lattice)": {
+    type: "lattice", maxSWL: 750,
+    specs: "Lattice boom mobile crane with luffing jib. Up to 147m hook height.",
+    configs: {
+      "84m main boom (outrigger — SSL)": { 8:750,10:680,12:580,15:480,18:400,21:340,24:290,27:248,30:213,36:161,42:124,48:97,54:76,60:60,66:48,72:38 },
+    },
+  },
+};
+
+// ─── LEEA REFERENCE DATA ──────────────────────────────────────────────────────
+const LEEA_DATA = {
+  wireSlings: {
+    label: "Wire Rope Slings", icon: "🔗",
+    grades: {
+      "6x19 IWRC - Grade 1770": {
+        info: "6×19 Independent Wire Rope Core — General purpose, good flexibility",
+        rows: [
+          { dia:8,  swl1:3.15, swl2:5.6,  swl3:6.3,  swl4:4.45, massPerM:0.234 },
+          { dia:10, swl1:4.75, swl2:8.5,  swl3:9.5,  swl4:6.7,  massPerM:0.369 },
+          { dia:12, swl1:6.9,  swl2:12.3, swl3:13.8, swl4:9.75, massPerM:0.530 },
+          { dia:16, swl1:12.0, swl2:21.5, swl3:24.0, swl4:17.0, massPerM:0.950 },
+          { dia:20, swl1:18.7, swl2:33.4, swl3:37.4, swl4:26.4, massPerM:1.48  },
+          { dia:24, swl1:27.0, swl2:48.1, swl3:54.0, swl4:38.1, massPerM:2.13  },
+          { dia:28, swl1:36.6, swl2:65.4, swl3:73.2, swl4:51.7, massPerM:2.90  },
+          { dia:32, swl1:47.8, swl2:85.4, swl3:95.6, swl4:67.6, massPerM:3.79  },
+        ],
+      },
+      "6x36 IWRC - Grade 1770": {
+        info: "6×36 Independent Wire Rope Core — High flexibility, multi-strand",
+        rows: [
+          { dia:10, swl1:4.55, swl2:8.1,  swl3:9.1,  swl4:6.4,  massPerM:0.378 },
+          { dia:12, swl1:6.55, swl2:11.7, swl3:13.1, swl4:9.25, massPerM:0.543 },
+          { dia:16, swl1:11.5, swl2:20.5, swl3:23.0, swl4:16.3, massPerM:0.968 },
+          { dia:20, swl1:18.0, swl2:32.1, swl3:36.0, swl4:25.5, massPerM:1.51  },
+          { dia:24, swl1:25.9, swl2:46.2, swl3:51.8, swl4:36.6, massPerM:2.18  },
+          { dia:32, swl1:46.0, swl2:82.1, swl3:92.0, swl4:65.0, massPerM:3.88  },
+        ],
+      },
+    },
+    columns: ["Ø (mm)","1-Leg SWL (t)","2-Leg 90° (t)","2-Leg 60° (t)","2-Leg 45° (t)","kg/m"],
+    keys: ["dia","swl1","swl2","swl3","swl4","massPerM"],
+    dimensions: { items: ["Diameter (d)","Minimum Length","Termination (Spliced Eye)","Termination (Ferrule)"], note: "Dimensions per EN 13414-1. Eye dimensions must be verified at inspection." },
+  },
+  chainSlings: {
+    label: "Chain Slings", icon: "⛓️",
+    grades: {
+      "Grade 8 — EN818-4": {
+        info: "High tensile alloy steel — Standard lifting chain. Colour ID: Gold",
+        rows: [
+          { dia:6,  swl1:1.12, swl2:2.0,  swl3:1.94, swl4:1.58, massPerM:0.70  },
+          { dia:8,  swl1:2.0,  swl2:3.55, swl3:3.46, swl4:2.82, massPerM:1.30  },
+          { dia:10, swl1:3.15, swl2:5.6,  swl3:5.45, swl4:4.45, massPerM:1.92  },
+          { dia:13, swl1:5.3,  swl2:9.45, swl3:9.19, swl4:7.49, massPerM:3.29  },
+          { dia:16, swl1:8.0,  swl2:14.2, swl3:13.9, swl4:11.3, massPerM:5.00  },
+          { dia:20, swl1:12.5, swl2:22.3, swl3:21.6, swl4:17.7, massPerM:7.80  },
+          { dia:22, swl1:15.0, swl2:26.7, swl3:26.0, swl4:21.2, massPerM:9.43  },
+          { dia:26, swl1:21.2, swl2:37.8, swl3:36.7, swl4:29.9, massPerM:13.2  },
+          { dia:32, swl1:31.5, swl2:56.2, swl3:54.5, swl4:44.5, massPerM:20.1  },
+        ],
+      },
+      "Grade 10 — EN818-4": {
+        info: "Very high tensile alloy steel — Superior to G8. Colour ID: Orange",
+        rows: [
+          { dia:6,  swl1:1.4,  swl2:2.5,  swl3:2.42, swl4:1.97, massPerM:0.70  },
+          { dia:8,  swl1:2.5,  swl2:4.45, swl3:4.33, swl4:3.53, massPerM:1.30  },
+          { dia:10, swl1:4.0,  swl2:7.1,  swl3:6.93, swl4:5.65, massPerM:1.92  },
+          { dia:13, swl1:6.7,  swl2:11.9, swl3:11.6, swl4:9.46, massPerM:3.29  },
+          { dia:16, swl1:10.0, swl2:17.8, swl3:17.3, swl4:14.1, massPerM:5.00  },
+          { dia:20, swl1:16.0, swl2:28.4, swl3:27.7, swl4:22.6, massPerM:7.80  },
+          { dia:22, swl1:19.0, swl2:33.8, swl3:32.9, swl4:26.8, massPerM:9.43  },
+          { dia:26, swl1:26.5, swl2:47.2, swl3:45.8, swl4:37.4, massPerM:13.2  },
+          { dia:32, swl1:40.0, swl2:71.3, swl3:69.3, swl4:56.5, massPerM:20.1  },
+        ],
+      },
+    },
+    columns: ["Ø (mm)","1-Leg SWL (t)","2-Leg 90° (t)","2-Leg 60° (t)","2-Leg 45° (t)","kg/m"],
+    keys: ["dia","swl1","swl2","swl3","swl4","massPerM"],
+    dimensions: { items: ["Pitch (p)","Width (w)","Link thickness (d)","Hook depth","Master link OD"], note: "Per EN818-2. All chain must be proof tested to 2× WLL before first use." },
+  },
+  webbingSlings: {
+    label: "Webbing Slings", icon: "🎗️",
+    grades: {
+      "EN1492-1 — Flat Webbing": {
+        info: "Polyester flat webbing slings — Blue coded. Not suitable for chemicals.",
+        rows: [
+          { width:30,  swl1:1.0,  swl2:1.78, swl3:2.0,  swl4:1.41, massPerM:0.35 },
+          { width:60,  swl1:2.0,  swl2:3.56, swl3:4.0,  swl4:2.82, massPerM:0.65 },
+          { width:90,  swl1:3.0,  swl2:5.35, swl3:6.0,  swl4:4.24, massPerM:0.95 },
+          { width:120, swl1:4.0,  swl2:7.1,  swl3:8.0,  swl4:5.65, massPerM:1.25 },
+          { width:150, swl1:5.0,  swl2:8.9,  swl3:10.0, swl4:7.07, massPerM:1.55 },
+          { width:180, swl1:6.0,  swl2:10.7, swl3:12.0, swl4:8.48, massPerM:1.85 },
+          { width:240, swl1:8.0,  swl2:14.3, swl3:16.0, swl4:11.3, massPerM:2.45 },
+          { width:300, swl1:10.0, swl2:17.8, swl3:20.0, swl4:14.1, massPerM:3.05 },
+        ],
+      },
+      "EN1492-2 — Round Sling": {
+        info: "Polyester round slings — Colour coded by SWL. Excellent surface protection.",
+        rows: [
+          { width:"Purple", swl1:1.0,  swl2:1.78, swl3:2.0,  swl4:1.41, massPerM:0.2 },
+          { width:"Green",  swl1:2.0,  swl2:3.56, swl3:4.0,  swl4:2.82, massPerM:0.4 },
+          { width:"Yellow", swl1:3.0,  swl2:5.35, swl3:6.0,  swl4:4.24, massPerM:0.6 },
+          { width:"Grey",   swl1:4.0,  swl2:7.1,  swl3:8.0,  swl4:5.65, massPerM:0.8 },
+          { width:"Red",    swl1:5.0,  swl2:8.9,  swl3:10.0, swl4:7.07, massPerM:1.0 },
+          { width:"Brown",  swl1:6.0,  swl2:10.7, swl3:12.0, swl4:8.48, massPerM:1.2 },
+          { width:"Blue",   swl1:8.0,  swl2:14.3, swl3:16.0, swl4:11.3, massPerM:1.6 },
+          { width:"Orange", swl1:10.0, swl2:17.8, swl3:20.0, swl4:14.1, massPerM:2.0 },
+        ],
+      },
+    },
+    columns: ["Width/Code","1-Leg SWL (t)","2-Leg 90° (t)","2-Leg 60° (t)","2-Leg 45° (t)","kg/m"],
+    keys: ["width","swl1","swl2","swl3","swl4","massPerM"],
+    dimensions: { items: ["Sling width","Thickness (flat)","Eye length","Eye width","Body length"], note: "Safe working loads apply when sling angle from vertical ≤ 45°. Never use damaged slings." },
+  },
+  shackles: {
+    label: "Shackles", icon: "🔒",
+    grades: {
+      "Bow (Anchor) Shackle — Grade S": {
+        info: "Omega / Anchor shackles — EN13889. For multi-leg sling attachment.",
+        rows: [
+          { size:"M8",  swl:0.5,  boltDia:8,  bowWidth:16, bowDepth:22,  mass:0.08 },
+          { size:"M10", swl:1.0,  boltDia:10, bowWidth:20, bowDepth:28,  mass:0.15 },
+          { size:"M12", swl:1.5,  boltDia:12, bowWidth:25, bowDepth:34,  mass:0.25 },
+          { size:"M16", swl:2.0,  boltDia:16, bowWidth:32, bowDepth:44,  mass:0.46 },
+          { size:"M20", swl:3.25, boltDia:20, bowWidth:40, bowDepth:55,  mass:0.90 },
+          { size:"M22", swl:4.75, boltDia:22, bowWidth:45, bowDepth:62,  mass:1.20 },
+          { size:"M24", swl:6.5,  boltDia:24, bowWidth:50, bowDepth:68,  mass:1.60 },
+          { size:"M30", swl:9.5,  boltDia:30, bowWidth:62, bowDepth:84,  mass:2.80 },
+          { size:"M36", swl:13.5, boltDia:36, bowWidth:75, bowDepth:102, mass:4.60 },
+        ],
+      },
+      "Dee (Chain) Shackle — Grade S": {
+        info: "D-shackles — EN13889. For in-line loading. Single leg only.",
+        rows: [
+          { size:"M8",  swl:0.5,  boltDia:8,  bowWidth:12, bowDepth:20, mass:0.06 },
+          { size:"M10", swl:1.0,  boltDia:10, bowWidth:16, bowDepth:25, mass:0.12 },
+          { size:"M12", swl:1.5,  boltDia:12, bowWidth:19, bowDepth:30, mass:0.20 },
+          { size:"M16", swl:2.0,  boltDia:16, bowWidth:25, bowDepth:40, mass:0.38 },
+          { size:"M20", swl:3.25, boltDia:20, bowWidth:32, bowDepth:50, mass:0.75 },
+          { size:"M22", swl:4.75, boltDia:22, bowWidth:36, bowDepth:55, mass:1.00 },
+          { size:"M24", swl:6.5,  boltDia:24, bowWidth:40, bowDepth:62, mass:1.30 },
+          { size:"M30", swl:9.5,  boltDia:30, bowWidth:50, bowDepth:78, mass:2.30 },
+        ],
+      },
+    },
+    columns: ["Size","SWL (t)","Bolt Ø (mm)","Bow Width (mm)","Bow Depth (mm)","Mass (kg)"],
+    keys: ["size","swl","boltDia","bowWidth","bowDepth","mass"],
+    dimensions: { items: ["Jaw width (A)","Bolt diameter (B)","Inside depth (C)","Bow width (D)","Overall length (E)"], note: "NEVER side-load a D-shackle. Always ensure the pin is secured. Inspect threads before every use." },
+  },
+  eyebolts: {
+    label: "Eye Bolts & Nuts", icon: "👁️",
+    grades: {
+      "Collar Eye Bolt — BS4278 Grade 8.8": {
+        info: "Shouldered (collared) eye bolts for angular loads. Collar must be seated fully.",
+        rows: [
+          { size:"M8",  swl_axial:0.21, swl_45deg:0.105, swl_90deg:0.063, thread:8,  shankL:16, eyeID:18 },
+          { size:"M10", swl_axial:0.32, swl_45deg:0.16,  swl_90deg:0.096, thread:10, shankL:20, eyeID:22 },
+          { size:"M12", swl_axial:0.50, swl_45deg:0.25,  swl_90deg:0.15,  thread:12, shankL:24, eyeID:26 },
+          { size:"M16", swl_axial:1.0,  swl_45deg:0.50,  swl_90deg:0.30,  thread:16, shankL:32, eyeID:34 },
+          { size:"M20", swl_axial:1.6,  swl_45deg:0.80,  swl_90deg:0.48,  thread:20, shankL:40, eyeID:42 },
+          { size:"M24", swl_axial:2.5,  swl_45deg:1.25,  swl_90deg:0.75,  thread:24, shankL:48, eyeID:50 },
+          { size:"M30", swl_axial:4.0,  swl_45deg:2.0,   swl_90deg:1.2,   thread:30, shankL:60, eyeID:62 },
+          { size:"M36", swl_axial:6.0,  swl_45deg:3.0,   swl_90deg:1.8,   thread:36, shankL:72, eyeID:74 },
+          { size:"M42", swl_axial:8.0,  swl_45deg:4.0,   swl_90deg:2.4,   thread:42, shankL:84, eyeID:86 },
+        ],
+      },
+      "Plain (Non-collar) Eye Bolt — DIN580": {
+        info: "Axial load ONLY. No angular loading permitted. Derating required for any angle.",
+        rows: [
+          { size:"M8",  swl_axial:0.14, swl_45deg:"N/A", swl_90deg:"N/A", thread:8,  shankL:16, eyeID:16 },
+          { size:"M10", swl_axial:0.20, swl_45deg:"N/A", swl_90deg:"N/A", thread:10, shankL:20, eyeID:20 },
+          { size:"M12", swl_axial:0.32, swl_45deg:"N/A", swl_90deg:"N/A", thread:12, shankL:24, eyeID:24 },
+          { size:"M16", swl_axial:0.63, swl_45deg:"N/A", swl_90deg:"N/A", thread:16, shankL:32, eyeID:32 },
+          { size:"M20", swl_axial:1.0,  swl_45deg:"N/A", swl_90deg:"N/A", thread:20, shankL:40, eyeID:40 },
+          { size:"M24", swl_axial:1.6,  swl_45deg:"N/A", swl_90deg:"N/A", thread:24, shankL:48, eyeID:48 },
+          { size:"M30", swl_axial:2.5,  swl_45deg:"N/A", swl_90deg:"N/A", thread:30, shankL:60, eyeID:60 },
+          { size:"M36", swl_axial:4.0,  swl_45deg:"N/A", swl_90deg:"N/A", thread:36, shankL:72, eyeID:72 },
+        ],
+      },
+    },
+    columns: ["Size","Axial SWL (t)","45° SWL (t)","90° SWL (t)","Thread Ø (mm)","Shank L (mm)","Eye ID (mm)"],
+    keys: ["size","swl_axial","swl_45deg","swl_90deg","thread","shankL","eyeID"],
+    dimensions: { items: ["Thread diameter (d)","Shank length (L)","Eye inside diameter (A)","Eye bar diameter (B)","Collar OD (C)"], note: "Always use collar eyebolts for angular loads. Inspect threads for damage before use. Torque to manufacturer specification." },
+  },
+  hooks: {
+    label: "Lifting Hooks", icon: "🪝",
+    grades: {
+      "Swivel Safety Hook — Grade 8": {
+        info: "360° swivel with safety latch. For use with chain slings. EN1677-1.",
+        rows: [
+          { cap:"1.0t",  swl:1.0,  throatW:19, throatD:32,  h:78,  mass:0.28 },
+          { cap:"2.0t",  swl:2.0,  throatW:25, throatD:44,  h:102, mass:0.62 },
+          { cap:"3.15t", swl:3.15, throatW:30, throatD:54,  h:122, mass:1.00 },
+          { cap:"5.0t",  swl:5.0,  throatW:38, throatD:68,  h:150, mass:1.80 },
+          { cap:"8.0t",  swl:8.0,  throatW:50, throatD:88,  h:192, mass:3.60 },
+          { cap:"10.0t", swl:10.0, throatW:56, throatD:98,  h:212, mass:4.80 },
+          { cap:"16.0t", swl:16.0, throatW:70, throatD:125, h:268, mass:9.50 },
+        ],
+      },
+      "Clevis Safety Hook — Grade 8": {
+        info: "Fixed eye clevis hook with safety latch. EN1677-1. Direct crane attachment.",
+        rows: [
+          { cap:"2.0t",  swl:2.0,  throatW:24, throatD:42,  h:100, mass:0.58 },
+          { cap:"5.0t",  swl:5.0,  throatW:37, throatD:66,  h:148, mass:1.65 },
+          { cap:"8.0t",  swl:8.0,  throatW:48, throatD:86,  h:188, mass:3.30 },
+          { cap:"10.0t", swl:10.0, throatW:54, throatD:96,  h:208, mass:4.40 },
+          { cap:"16.0t", swl:16.0, throatW:68, throatD:122, h:262, mass:8.80 },
+          { cap:"20.0t", swl:20.0, throatW:76, throatD:136, h:292, mass:12.5 },
+          { cap:"25.0t", swl:25.0, throatW:85, throatD:152, h:326, mass:17.5 },
+        ],
+      },
+    },
+    columns: ["Capacity","SWL (t)","Throat W (mm)","Throat D (mm)","Height (mm)","Mass (kg)"],
+    keys: ["cap","swl","throatW","throatD","h","mass"],
+    dimensions: { items: ["Throat opening (A)","Throat depth (B)","Shank length (C)","Overall height (H)","Eye/Clevis width (E)"], note: "Always use safety latches. Inspect for deformation or cracks. Never side-load a hook." },
+  },
+};
+
+// ─── CRANE HELPERS ─────────────────────────────────────────────────────────────
+function getCapacityAtRadius(craneModel, config, radiusM) {
+  const crane = CRANE_DATABASE[craneModel]; if (!crane) return null;
+  const chart = crane.configs[config]; if (!chart) return null;
+  const radii = Object.keys(chart).map(Number).sort((a, b) => a - b);
+  const r = radiusM;
+  if (chart[r] !== undefined) return chart[r];
+  const lower = [...radii].reverse().find(x => x <= r);
+  const upper = radii.find(x => x > r);
+  if (lower === undefined) return chart[radii[0]];
+  if (upper === undefined) return null;
+  const t = (r - lower) / (upper - lower);
+  return chart[lower] + t * (chart[upper] - chart[lower]);
+}
+function getMinRadius(craneModel, config) {
+  const crane = CRANE_DATABASE[craneModel];
+  if (!crane || !crane.configs[config]) return 3;
+  return Math.min(...Object.keys(crane.configs[config]).map(Number));
+}
+function getMaxRadius(craneModel, config) {
+  const crane = CRANE_DATABASE[craneModel];
+  if (!crane || !crane.configs[config]) return 50;
+  return Math.max(...Object.keys(crane.configs[config]).map(Number));
+}
+
+// ─── STATIC DATA ──────────────────────────────────────────────────────────────
+const DEMO_PLANS = [
+  { ref:"LP-2024-0847", name:"Pressure Reduction Station Module Lift", site:"North Sea Gas Terminal, Aberdeen AB11 5PG", date:"14 Mar 2025", status:"approved",  weight:"24,500 kg", crane:"Liebherr LTM 1500-8.1" },
+  { ref:"LP-2024-0851", name:"Pipeline Spool Section Installation",    site:"Feeder Main Upgrade — Sector 4, Midlands",  date:"22 Mar 2025", status:"draft",     weight:"6,800 kg",  crane:"Liebherr LTM 1090-4.2" },
+];
+
+const HAZARDS = [
+  { id:1, hazard:"Load drop / uncontrolled movement",  likelihood:2, severity:5, control:"100% SWL verification, tag lines fitted, load secured with minimum 4 attachment points. All riggers trained to LEEA standard.", residual:2 },
+  { id:2, hazard:"Crane overload / structural failure", likelihood:1, severity:5, control:"Crane radius and load chart verified. Load weight confirmed by weighing or engineering calc. Capacity ≤85% SWL.", residual:1 },
+  { id:3, hazard:"Personnel struck by load",            likelihood:2, severity:4, control:"Exclusion zone established (1.5× load dimensions). Banksman maintains constant visual. Operatives briefed.", residual:2 },
+  { id:4, hazard:"Ground bearing failure",              likelihood:2, severity:4, control:"Ground bearing pressure survey completed. Crane mats deployed. Outrigger loads checked against survey.", residual:2 },
+  { id:5, hazard:"Adverse weather / high wind",         likelihood:3, severity:3, control:"Wind speed monitored. Lift suspended if wind > 38 km/h (10.5 m/s). Weather forecast reviewed prior to lift.", residual:2 },
+  { id:6, hazard:"Sling/rigging gear failure",          likelihood:1, severity:5, control:"All rigging gear inspected and certificated. LEEA-approved supplier. 6-monthly thorough examination current.", residual:1 },
+  { id:7, hazard:"Overhead power line contact",         likelihood:1, severity:5, control:"Proximity to power lines assessed. Exclusion zone established 9m from nearest conductor. Goal posts erected.", residual:1 },
+  { id:8, hazard:"Communication failure",               likelihood:2, severity:3, control:"Two-way radio with designated lift channel. Hand signals as backup. Pre-lift briefing conducted.", residual:1 },
+];
+
+const METHOD_STEPS = [
+  { id:1, tag:"Preparation",     text:"AP to conduct site walk and confirm exclusion zone is clear. All personnel briefed and signed onto Lifting Plan." },
+  { id:2, tag:"Crane Setup",     text:"Position mobile crane on prepared hardstanding. Deploy outriggers fully. Level crane. Verify ground conditions." },
+  { id:3, tag:"Rigging Setup",   text:"Rigger to attach 4-leg chain sling set to load attachment points. Confirm sling angles within design limits (≥45°). Shackles correctly pinned and moused." },
+  { id:4, tag:"Pre-Lift Check",  text:"AP to carry out final inspection of rigging configuration, load security, and crane setup. All personnel at safe positions." },
+  { id:5, tag:"Lift Commencement", text:"Operator takes up slack at Banksman signal. Load lifted 300mm clear of ground. PAUSE. AP inspects for load stability." },
+  { id:6, tag:"Lift in Progress", text:"On AP approval, load elevated to travel height. Tag lines used to control rotation. Exclusion zone maintained throughout." },
+  { id:7, tag:"Set-Down",        text:"Load positioned over landing area. Banksman guides final position. Load lowered onto pre-positioned timber bearers." },
+  { id:8, tag:"Completion",      text:"Rigging gear removed and inspected. Crane de-rigged. Site reinstated. AP completes sign-off on Lifting Plan." },
+];
+
+const EQUIPMENT_CHECKS = [
+  "Crane operator certificate valid and in date",
+  "Crane load chart appropriate for configured radius",
+  "Outrigger pads/mats deployed and stable",
+  "Slewing ring lubricated and free of obstruction",
+  "Anti-two-block device operational and tested",
+  "Rated capacity indicator (RCI) calibrated",
+  "Wire rope/block & tackle inspected (no kinks/broken wires)",
+  "Sling set SWL ≥ calculated load",
+  "Shackle pins secured and moused correctly",
+  "All rigging gear in current thorough examination",
+  "Banksman in position with clear line of sight",
+  "Exclusion zone barriers erected and signed",
+  "Radio communication tested and clear on designated channel",
+  "Lift Plan signed by AP and physically on site",
+];
+
+const RIGGING_GEAR = ["4-Leg Chain Sling 50T","Single Flat Webbing Sling","Round Sling (polyester)","Wire Rope Sling Set","Spreader Beam 12m","Lifting Frame"];
+const SHACKLES_LIST = ["Dee Shackle 17T","Bow Shackle 25T","Safety Shackle 55T","Screw Pin Shackle 12T"];
+
+const initPlanData = {
+  project: { name:"Pressure Reduction Station — PRS Module Lift", site:"North Sea Gas Terminal, Aberdeen AB11 5PG", client:"ADNOC Gas Infrastructure / Petrofac Ltd", date:"2025-04-02", time:"07:30", weather:{ wind:"12", visibility:"Good", temp:"11", condition:"Overcast" }, access:"Permit-to-work required. Gas detection equipment mandatory. 6m height restriction on access road — heavy transport pre-approved." },
+  personnel: { ap:{ name:"Mahmoud Elsayed CMIOSH", cert:"LEEA-AP-04421", company:"Al-Rafidain Lifting Solutions Ltd" }, operator:{ name:"Tariq Al-Rashidi", cert:"CPCS A60 — Mobile Crane", card:"CS/789012" }, riggers:[{ name:"Omar Khalil", level:"Appointed" },{ name:"Yusuf Al-Amin", level:"Competent" }], banksman:"Bilal Nassar — CPCS A40 Slinger/Signaller", emergency:"Site Safety Officer: +44 7700 900142" },
+  load: { description:"Pressure Reduction Station Module — complete skid assembly", weight:24500, dims:{ l:5800, w:3200, h:3600 }, cog:"Slightly forward — CoG offset 450mm from centreline, manufacturer confirmed", attachments:"Four certified lifting lugs, ISO welded, load tested 36.75T", special:"Pressure-containing equipment — no impact loading, vertical lift only, flange protectors fitted" },
+  equipment: { craneType:"mobile", craneModel:"Liebherr LTM 1500-8.1", config:"55m boom + LLD (8-outrigger full)", swl:500, radius:18, rigging:["4-Leg Chain Sling 50T"], shackles:["Bow Shackle 25T"] },
+  liftZone: { groundBearing:250, exclusionRadius:15, obstructions:"Overhead lighting gantry at 8m height. Transformer building 22m SE.", liftPath:"Vertical rise 12m, slew 45° NW, horizontal traverse 14m, lower to plinth" },
+  risks: HAZARDS,
+  method: METHOD_STEPS,
+  signoffs: { ap:false, supervisor:false, client:false },
+  checks: new Array(EQUIPMENT_CHECKS.length).fill(false),
+};
+
+// ─── APP ROOT ─────────────────────────────────────────────────────────────────
+function App() {
+  const [view, setView] = useState("dashboard");
+  const [step, setStep] = useState(1);
+  const [planData, setPlanData] = useState(initPlanData);
+  const [saveStatus, setSaveStatus] = useState("All changes saved");
+
+  const updatePlan = useCallback((path, value) => {
+    setSaveStatus("Saving…");
+    setPlanData(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      const keys = path.split(".");
+      let obj = next;
+      for (let i = 0; i < keys.length - 1; i++) obj = obj[keys[i]];
+      obj[keys[keys.length - 1]] = value;
+      return next;
+    });
+    setTimeout(() => setSaveStatus("All changes saved"), 800);
+  }, []);
+
+  const STEP_LABELS = ["Project","Personnel","Load","Equipment","Lift Zone","Risk","Method","Sign-Off"];
+
+  const isDarkView = ["crane","accessories","calculator"].includes(view);
+
+  return (
+    <>
+      <style>{globalStyles}</style>
+      <div className="app-root" style={isDarkView ? { background: "var(--dark-bg)" } : {}}>
+        <Header view={view} saveStatus={saveStatus}
+          onNav={v => { setView(v); if (v === "wizard") setStep(1); }}
+          planRef={["wizard","preview"].includes(view) ? "LP-2025-0863" : null} />
+        {view === "dashboard"   && <Dashboard onNewPlan={() => { setView("wizard"); setStep(1); }} onNav={setView} />}
+        {view === "wizard"      && <Wizard step={step} setStep={setStep} planData={planData} updatePlan={updatePlan} onPreview={() => setView("preview")} stepLabels={STEP_LABELS} />}
+        {view === "preview"     && <PlanPreview planData={planData} onBack={() => setView("wizard")} />}
+        {view === "crane"       && <CraneAnalysisTab />}
+        {view === "accessories" && <AccessoriesTab />}
+        {view === "calculator"  && <LoadCalculatorTab />}
+      </div>
+    </>
+  );
+}
+
+// ─── HEADER ───────────────────────────────────────────────────────────────────
+function Header({ view, saveStatus, onNav, planRef }) {
+  return (
+    <header className="app-header">
+      <div className="header-logo" onClick={() => onNav("dashboard")}>
+        <div className="header-logo-icon">AP</div>
+        <div>
+          <div className="header-logo-text">LiftPlan Pro</div>
+          <div className="header-logo-sub">LOLER · BS 7121 · LEEA</div>
         </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🏗️</div>
-          <div class="feature-title">Crane Database</div>
-          <div class="feature-desc">8 crane models with full load chart data. Select any radius and get interpolated capacity instantly — colour-coded utilisation status at a glance.</div>
-          <div class="feature-tags"><span class="feature-tag">Liebherr</span><span class="feature-tag">Demag</span><span class="feature-tag">Load Chart Interpolation</span></div>
+      </div>
+      {planRef && (
+        <div style={{ display:"flex", alignItems:"center", gap:16, fontFamily:"var(--font-display)" }}>
+          <div className="plan-ref-badge">{planRef}</div>
+          <div className="save-status"><div className="save-dot pulse" />{saveStatus}</div>
         </div>
+      )}
+      <nav className="header-nav">
+        <button className={`header-nav-btn ${view==="dashboard"?"active":""}`}   onClick={() => onNav("dashboard")}>Dashboard</button>
+        <button className={`header-nav-btn ${view==="wizard"?"active":""}`}      onClick={() => onNav("wizard")}>New Plan</button>
+        {view==="preview" && <button className={`header-nav-btn active`}          onClick={() => onNav("preview")}>Preview</button>}
+        <div className="header-nav-sep" />
+        <button className={`header-nav-btn ${view==="crane"?"active":""}`}        onClick={() => onNav("crane")}>🏗 Crane AI</button>
+        <button className={`header-nav-btn ${view==="accessories"?"active":""}`}  onClick={() => onNav("accessories")}>⛓ Accessories</button>
+        <button className={`header-nav-btn ${view==="calculator"?"active":""}`}  onClick={() => onNav("calculator")}>📐 Load Calc</button>
+      </nav>
+    </header>
+  );
+}
 
-        <div class="feature-card">
-          <div class="feature-icon">⚖️</div>
-          <div class="feature-title">Live Capacity Calculator</div>
-          <div class="feature-desc">Drag the radius slider — watch capacity, utilisation % and headroom update in real time against the actual load weight. Instant red/amber/green status.</div>
-          <div class="feature-tags"><span class="feature-tag">Real-Time</span><span class="feature-tag">SWL Verification</span></div>
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+function Dashboard({ onNewPlan, onNav }) {
+  return (
+    <div className="dashboard animate-up">
+      <div className="dashboard-hero">
+        <div>
+          <div className="hero-greeting">Appointed Person Portal</div>
+          <div className="hero-name">Mahmoud Elsayed</div>
+          <div className="hero-role">Al-Rafidain Lifting Solutions Ltd — Senior AP</div>
+          <div className="hero-cert">🏅 LEEA-AP-04421 · CMIOSH · CPCS A62 · Valid to Dec 2026</div>
         </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">⛓️</div>
-          <div class="feature-title">LEEA Accessories Library</div>
-          <div class="feature-desc">Complete SWL tables for wire rope slings, chain slings, flat & round webbing, shackles, eye bolts and lifting hooks — all grades, all angles.</div>
-          <div class="feature-tags"><span class="feature-tag">EN 13414</span><span class="feature-tag">EN 818</span><span class="feature-tag">EN 1492</span><span class="feature-tag">EN 13889</span></div>
+        <div className="hero-cta">
+          <button className="btn-primary" onClick={onNewPlan}>+ New Lifting Plan</button>
+          <button className="btn-secondary">Import Existing Plan</button>
         </div>
+      </div>
+      <div className="stats-row">
+        {[
+          { label:"Active Lifts",    value:"3",    sub:"2 approved, 1 draft",       cls:"yellow" },
+          { label:"Completed",       value:"47",   sub:"This quarter",               cls:"green"  },
+          { label:"Pending Review",  value:"2",    sub:"Awaiting client sign-off",   cls:"amber"  },
+          { label:"Compliance Rate", value:"100%", sub:"No RIDDOR incidents 2024",   cls:"navy"   },
+        ].map(s => (
+          <div key={s.label} className={`stat-card ${s.cls}`}>
+            <div className="stat-label">{s.label}</div>
+            <div className="stat-value" style={s.cls==="navy"?{color:"var(--green)"}:{}}>{s.value}</div>
+            <div className="stat-sub">{s.sub}</div>
+          </div>
+        ))}
+      </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">📐</div>
-          <div class="feature-title">Load Calculator</div>
-          <div class="feature-desc">Set number of legs, sling angle, dynamic factor — get tension per leg and utilisation % instantly. Live SVG rigging diagram updates as you type.</div>
-          <div class="feature-tags"><span class="feature-tag">Sling Tension</span><span class="feature-tag">De-Rating</span><span class="feature-tag">Dynamic Factor</span></div>
-        </div>
+      {/* Quick Access — LEEA Tools */}
+      <div className="section-title">LEEA Technical Tools</div>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:32 }}>
+        {[
+          { icon:"🏗️", title:"AI Crane Analysis",   desc:"Upload a data sheet — extract SWL charts, specs & certs automatically", view:"crane",       badge:"AI Powered" },
+          { icon:"⛓️", title:"Accessories Library", desc:"LEEA-compliant SWL tables for wire, chain, webbing slings & hardware",  view:"accessories", badge:"EN13414 · EN818" },
+          { icon:"📐", title:"Load Calculator",     desc:"Dynamic sling tension & utilisation with real-time visual diagram",    view:"calculator",  badge:"Interactive" },
+        ].map(t => (
+          <div key={t.view} onClick={() => onNav(t.view)} style={{ background:"var(--navy-dark)", border:"1px solid var(--navy-light)", borderRadius:8, padding:"22px 24px", cursor:"pointer", transition:"all 0.2s", borderBottom:"3px solid var(--yellow)" }}
+            onMouseEnter={e => e.currentTarget.style.transform="translateY(-3px)"}
+            onMouseLeave={e => e.currentTarget.style.transform="none"}>
+            <div style={{ fontSize:32, marginBottom:10 }}>{t.icon}</div>
+            <div style={{ fontFamily:"var(--font-display)", fontSize:18, fontWeight:700, color:"var(--yellow)", marginBottom:6 }}>{t.title}</div>
+            <div style={{ fontSize:12, color:"var(--gray-400)", marginBottom:10 }}>{t.desc}</div>
+            <span style={{ background:"rgba(245,195,0,0.15)", color:"var(--yellow)", padding:"2px 8px", borderRadius:3, fontFamily:"var(--font-display)", fontSize:10, fontWeight:700, letterSpacing:2 }}>{t.badge}</span>
+          </div>
+        ))}
+      </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">🤖</div>
-          <div class="feature-title">AI Crane Analyser</div>
-          <div class="feature-desc">Drop any crane data sheet — PDF or photo. Claude AI reads it and extracts SWL charts, speeds, duty cycle, safety devices and certifications automatically.</div>
-          <div class="feature-tags"><span class="feature-tag">Claude AI</span><span class="feature-tag">PDF Upload</span><span class="feature-tag">Auto Extract</span></div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">📐</div>
-          <div class="feature-title">Sling Angle Visualiser</div>
-          <div class="feature-desc">Interactive diagram — move the angle slider and watch de-rating factor and leg tension recalculate instantly. Clear visual of what happens below 45°.</div>
-          <div class="feature-tags"><span class="feature-tag">De-Rating</span><span class="feature-tag">Visual Aid</span></div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">✅</div>
-          <div class="feature-title">Pre-Lift Checklist</div>
-          <div class="feature-desc">14-point LEEA pre-lift checklist embedded in the sidebar — always visible during plan creation. Progress bar tracks completion in real time.</div>
-          <div class="feature-tags"><span class="feature-tag">LEEA</span><span class="feature-tag">14-Point Check</span></div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🌤️</div>
-          <div class="feature-title">Weather Monitor</div>
-          <div class="feature-desc">Live wind-speed input with automatic flag: OK / Monitor / SUSPEND LIFT at the 38 km/h LEEA operational threshold. Temperature and visibility tracking.</div>
-          <div class="feature-tags"><span class="feature-tag">38 km/h Threshold</span><span class="feature-tag">Go / No-Go</span></div>
-        </div>
-
+      <div className="section-title">Recent Lifting Plans</div>
+      <div className="plans-grid">
+        {DEMO_PLANS.map(p => (
+          <div key={p.ref} className="plan-card">
+            <div className="plan-card-ref">{p.ref}</div>
+            <div className="plan-card-name">{p.name}</div>
+            <div className="plan-card-meta">📍 {p.site}<br />🏗 {p.crane}<br />⚖ {p.weight} · 📅 {p.date}</div>
+            <span className={`status-badge ${p.status}`}><span className="status-dot" />{p.status.toUpperCase()}</span>
+          </div>
+        ))}
+      </div>
+      <div className="section-title">Crane Fleet — {Object.keys(CRANE_DATABASE).length} Models Loaded</div>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
+        {Object.entries(CRANE_DATABASE).slice(0,8).map(([name,data]) => (
+          <div key={name} className="stat-card navy" style={{ cursor:"pointer" }}>
+            <div style={{ fontSize:20, marginBottom:6 }}>{data.type==="mobile"?"🏗":data.type==="tower"?"🗼":data.type==="crawler"?"⛏":data.type==="lattice"?"🔧":"🏭"}</div>
+            <div style={{ fontFamily:"var(--font-display)", fontWeight:700, fontSize:13, marginBottom:2 }}>{name}</div>
+            <div style={{ fontSize:11, color:"var(--gray-400)" }}>Max SWL: {data.maxSWL}T · {Object.keys(data.configs).length} config{Object.keys(data.configs).length>1?"s":""}</div>
+          </div>
+        ))}
       </div>
     </div>
-  </section>
+  );
+}
 
-  <!-- STANDARDS -->
-  <section id="standards" class="standards-section">
-    <div class="container">
-      <div class="section-label">Compliance</div>
-      <h2 class="section-title">Built to the <span>standards</span><br>that matter</h2>
-      <div class="standards-grid">
-        <div class="std-card"><div class="std-dot"></div><div><div class="std-name">LOLER 1998</div><div class="std-desc">Lifting Operations & Lifting Equipment Regulations</div></div></div>
-        <div class="std-card"><div class="std-dot"></div><div><div class="std-name">BS 7121</div><div class="std-desc">Code of Practice for Safe Use of Cranes</div></div></div>
-        <div class="std-card"><div class="std-dot"></div><div><div class="std-name">EN 13414-1</div><div class="std-desc">Wire Rope Sling Safety Requirements</div></div></div>
-        <div class="std-card"><div class="std-dot"></div><div><div class="std-name">EN 818-2/4</div><div class="std-desc">Short Link Chain & Chain Slings for Lifting</div></div></div>
-        <div class="std-card"><div class="std-dot"></div><div><div class="std-name">EN 1492-1/2</div><div class="std-desc">Flat Webbing & Round Slings</div></div></div>
-        <div class="std-card"><div class="std-dot"></div><div><div class="std-name">EN 13889</div><div class="std-desc">Forged Steel Shackles for General Lifting</div></div></div>
-        <div class="std-card"><div class="std-dot"></div><div><div class="std-name">BS 4278</div><div class="std-desc">Eyebolts for Lifting Purposes</div></div></div>
-        <div class="std-card"><div class="std-dot"></div><div><div class="std-name">EN 1677-1</div><div class="std-desc">Components for Slings — Forged Steel Hooks</div></div></div>
-        <div class="std-card"><div class="std-dot"></div><div><div class="std-name">PUWER 1998</div><div class="std-desc">Provision and Use of Work Equipment Regs</div></div></div>
+// ─── WIZARD ───────────────────────────────────────────────────────────────────
+function Wizard({ step, setStep, planData, updatePlan, onPreview, stepLabels }) {
+  const totalSteps = 8;
+  const goNext = () => step < totalSteps ? setStep(s=>s+1) : onPreview();
+  const goPrev = () => step > 1 && setStep(s=>s-1);
+
+  const steps = [
+    <Step1 data={planData.project}   update={(k,v)=>updatePlan(`project.${k}`,v)}   />,
+    <Step2 data={planData.personnel} />,
+    <Step3 data={planData.load}      update={(k,v)=>updatePlan(`load.${k}`,v)}      />,
+    <Step4 data={planData.equipment} update={(k,v)=>updatePlan(`equipment.${k}`,v)} />,
+    <Step5 data={planData.liftZone}  update={(k,v)=>updatePlan(`liftZone.${k}`,v)}  />,
+    <Step6 risks={planData.risks} />,
+    <Step7 steps={planData.method} />,
+    <Step8 planData={planData} updatePlan={updatePlan} onFinish={onPreview} />,
+  ];
+  const stepTitles = ["Project & Site Information","Personnel & Responsibilities","Load Details","Lifting Equipment Selection","Lift Zone & Exclusion Area","Risk Assessment","Method Statement","Review & Sign-Off"];
+  const stepSubs   = ["Project name, site, client, dates, weather","AP, Crane Operator, Riggers, Banksman","Load description, weight, dimensions, CoG","Crane selection from database, rigging gear","Lift path, obstructions, exclusion zones","Hazard identification, risk matrix, controls","Lift sequence, signals, abort criteria","Full plan review, digital sign-off, export"];
+
+  return (
+    <div className="wizard-container animate-up">
+      <div className="wizard-progress">
+        <div className="progress-steps">
+          {stepLabels.map((label,i)=>(
+            <div key={i} className={`progress-step ${i+1===step?"active":i+1<step?"done":""}`} onClick={()=>setStep(i+1)}>
+              <div className="progress-step-dot">{i+1<step?"✓":i+1}</div>
+              <div className="progress-step-label">{label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="wizard-layout">
+        <div>
+          <div className="wizard-card">
+            <div className="wizard-card-header">
+              <div className="step-number">{step}</div>
+              <div>
+                <div className="step-title">{stepTitles[step-1]}</div>
+                <div className="step-subtitle">{stepSubs[step-1]}</div>
+              </div>
+            </div>
+            <div className="wizard-card-body">{steps[step-1]}</div>
+            <div className="wizard-nav">
+              <button className="btn-nav prev" onClick={goPrev} disabled={step===1} style={{opacity:step===1?0.4:1}}>← Previous</button>
+              <span style={{fontFamily:"var(--font-display)",fontSize:12,color:"var(--gray-400)",letterSpacing:2}}>STEP {step} OF {totalSteps}</span>
+              <button className={`btn-nav ${step===totalSteps?"finish":"next"}`} onClick={goNext}>{step===totalSteps?"Generate Plan →":"Next →"}</button>
+            </div>
+          </div>
+        </div>
+        <div className="wizard-sidebar">
+          <CapacityCalculator equipment={planData.equipment} loadWeight={planData.load.weight} />
+          <WeatherWidget data={planData.project.weather} />
+          <SlingAngleDiagram />
+          <ChecklistWidget checks={planData.checks} updatePlan={updatePlan} />
+        </div>
       </div>
     </div>
-  </section>
+  );
+}
 
-  <!-- CRANE DATABASE -->
-  <section id="cranes">
-    <div class="container">
-      <div class="section-label">Fleet</div>
-      <h2 class="section-title">Crane <span>database</span></h2>
-      <p class="section-desc">All models include verified load chart data with linear interpolation at any working radius. More models added with every community contribution.</p>
+// ─── STEP 1 ───────────────────────────────────────────────────────────────────
+function Step1({ data, update }) {
+  const wind = parseFloat(data.weather?.wind || 0);
+  return (
+    <div>
+      <div className="form-section">
+        <div className="form-section-title">Project Details</div>
+        <div className="form-grid">
+          <div className="form-group form-full"><label className="form-label">Project Name <span className="required">*</span></label><input className="form-input" value={data.name} onChange={e=>update("name",e.target.value)} /></div>
+          <div className="form-group form-full"><label className="form-label">Site Address <span className="required">*</span></label><input className="form-input" value={data.site} onChange={e=>update("site",e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">Client</label><input className="form-input" value={data.client} onChange={e=>update("client",e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">Lift Date</label><input className="form-input" type="date" value={data.date} onChange={e=>update("date",e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">Start Time</label><input className="form-input" type="time" value={data.time} onChange={e=>update("time",e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">Plan Reference</label><input className="form-input" value="LP-2025-0863" readOnly style={{opacity:0.7}} /></div>
+        </div>
+      </div>
+      <div className="form-section">
+        <div className="form-section-title">Weather Conditions</div>
+        <div className="form-grid">
+          <div className="form-group"><label className="form-label">Wind Speed (km/h)</label><input className="form-input" type="number" value={data.weather?.wind} onChange={e=>update("weather",{...data.weather,wind:e.target.value})} /></div>
+          <div className="form-group"><label className="form-label">Temperature (°C)</label><input className="form-input" type="number" value={data.weather?.temp} onChange={e=>update("weather",{...data.weather,temp:e.target.value})} /></div>
+          <div className="form-group"><label className="form-label">Visibility</label><select className="form-select" value={data.weather?.visibility} onChange={e=>update("weather",{...data.weather,visibility:e.target.value})}><option>Good</option><option>Moderate</option><option>Poor</option><option>Fog</option></select></div>
+          <div className="form-group"><label className="form-label">Conditions</label><select className="form-select" value={data.weather?.condition} onChange={e=>update("weather",{...data.weather,condition:e.target.value})}><option>Clear</option><option>Overcast</option><option>Light Rain</option><option>Heavy Rain</option><option>Snow/Ice</option></select></div>
+        </div>
+        {wind>38 && <div className="alert alert-red" style={{marginTop:12}}>⛔ Wind speed exceeds 38 km/h operational limit. Lift must be suspended immediately.</div>}
+        {wind>25 && wind<=38 && <div className="alert alert-yellow" style={{marginTop:12}}>⚠ Wind speed approaching limit. Increased monitoring required.</div>}
+      </div>
+      <div className="form-section">
+        <div className="form-section-title">Site Access & Restrictions</div>
+        <div className="form-group"><label className="form-label">Access Notes</label><textarea className="form-textarea" rows={3} value={data.access} onChange={e=>update("access",e.target.value)} /></div>
+      </div>
+    </div>
+  );
+}
 
-      <div class="crane-table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Crane Model</th>
-              <th>Type</th>
-              <th>Max SWL</th>
-              <th>Configurations</th>
-            </tr>
-          </thead>
+// ─── STEP 2 ───────────────────────────────────────────────────────────────────
+function Step2({ data }) {
+  return (
+    <div>
+      <div className="form-section">
+        <div className="form-section-title">Appointed Person</div>
+        <div className="form-grid">
+          <div className="form-group"><label className="form-label">Full Name</label><input className="form-input" value={data.ap.name} readOnly /></div>
+          <div className="form-group"><label className="form-label">Certification No.</label><input className="form-input" value={data.ap.cert} readOnly /></div>
+          <div className="form-group form-full"><label className="form-label">Company</label><input className="form-input" value={data.ap.company} readOnly /></div>
+        </div>
+      </div>
+      <div className="form-section">
+        <div className="form-section-title">Crane Operator</div>
+        <div className="form-grid">
+          <div className="form-group"><label className="form-label">Operator Name</label><input className="form-input" value={data.operator.name} readOnly /></div>
+          <div className="form-group"><label className="form-label">CPCS Category</label><input className="form-input" value={data.operator.cert} readOnly /></div>
+          <div className="form-group"><label className="form-label">Card Number</label><input className="form-input" value={data.operator.card} readOnly /></div>
+        </div>
+      </div>
+      <div className="form-section">
+        <div className="form-section-title">Rigging Team</div>
+        <table className="personnel-table" style={{marginBottom:12}}>
+          <thead><tr><th>Name</th><th>Role</th><th>Level</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td class="td-name">Liebherr LTM 1500-8.1</td><td><span class="type-badge">Mobile</span></td><td class="td-swl">500 T</td><td>3 configs incl. 75% outrigger</td></tr>
-            <tr><td class="td-name">Liebherr LTM 1300-6.2</td><td><span class="type-badge">Mobile</span></td><td class="td-swl">300 T</td><td>2 configs — 60m & 45m boom</td></tr>
-            <tr><td class="td-name">Liebherr LTM 1100-5.2</td><td><span class="type-badge">Mobile</span></td><td class="td-swl">100 T</td><td>2 configs — 52m & 35m boom</td></tr>
-            <tr><td class="td-name">Liebherr LTM 1090-4.2</td><td><span class="type-badge">Mobile</span></td><td class="td-swl">90 T</td><td>3 configs incl. 75% outrigger</td></tr>
-            <tr><td class="td-name">Demag AC 50-1</td><td><span class="type-badge">Mobile</span></td><td class="td-swl">50 T</td><td>3 configs incl. 75% outrigger</td></tr>
-            <tr><td class="td-name">Demag AC 300-6</td><td><span class="type-badge">Mobile</span></td><td class="td-swl">300 T</td><td>2 configs — 60m & 45m boom</td></tr>
-            <tr><td class="td-name">Demag AC 700-9</td><td><span class="type-badge">Mobile</span></td><td class="td-swl">700 T</td><td>1 config — 84m super-lift</td></tr>
-            <tr><td class="td-name">Liebherr LG 1750</td><td><span class="type-badge">Lattice</span></td><td class="td-swl">750 T</td><td>1 config — 84m SSL</td></tr>
+            {data.riggers.map((r,i)=>(
+              <tr key={i}><td>{r.name}</td><td>Rigger</td><td><span className="info-tag">{r.level}</span></td><td><span className="status-badge approved"><span className="status-dot"/>CURRENT</span></td></tr>
+            ))}
+            <tr><td>{data.banksman?.split("—")[0]}</td><td>Banksman</td><td><span className="info-tag">CPCS A40</span></td><td><span className="status-badge approved"><span className="status-dot"/>CURRENT</span></td></tr>
+          </tbody>
+        </table>
+        <button className="btn-secondary" style={{fontSize:13}}>+ Add Team Member</button>
+      </div>
+      <div className="form-section">
+        <div className="form-section-title">Emergency Contact</div>
+        <div className="form-group"><label className="form-label">Emergency Contact</label><input className="form-input" value={data.emergency} readOnly /></div>
+        <div className="alert alert-yellow" style={{marginTop:12}}>📋 All personnel must sign the Toolbox Talk register before lift commences.</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── STEP 3 ───────────────────────────────────────────────────────────────────
+function Step3({ data, update }) {
+  return (
+    <div>
+      <div className="form-section">
+        <div className="form-section-title">Load Identification</div>
+        <div className="form-grid">
+          <div className="form-group form-full"><label className="form-label">Load Description <span className="required">*</span></label><input className="form-input" value={data.description} onChange={e=>update("description",e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">Weight (kg)</label><input className="form-input" type="number" value={data.weight} onChange={e=>update("weight",+e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">Weight (Tonnes)</label><input className="form-input" value={`${(data.weight/1000).toFixed(3)} T`} readOnly style={{opacity:0.7}} /></div>
+        </div>
+      </div>
+      <div className="form-section">
+        <div className="form-section-title">Load Dimensions</div>
+        <div className="form-grid-3">
+          <div className="form-group"><label className="form-label">Length (mm)</label><input className="form-input" type="number" value={data.dims?.l} onChange={e=>update("dims",{...data.dims,l:+e.target.value})} /></div>
+          <div className="form-group"><label className="form-label">Width (mm)</label><input className="form-input" type="number" value={data.dims?.w} onChange={e=>update("dims",{...data.dims,w:+e.target.value})} /></div>
+          <div className="form-group"><label className="form-label">Height (mm)</label><input className="form-input" type="number" value={data.dims?.h} onChange={e=>update("dims",{...data.dims,h:+e.target.value})} /></div>
+        </div>
+        <svg viewBox="0 0 320 140" style={{width:"100%",maxWidth:320,border:"2px solid var(--gray-200)",borderRadius:6,background:"var(--gray-100)",margin:"16px 0"}}>
+          <rect x="80" y="30" width="160" height="80" fill="white" stroke="var(--navy)" strokeWidth="2.5"/>
+          {[100,220,100,220].map((x,i)=><circle key={i} cx={x} cy={i<2?30:110} r="5" fill="var(--yellow)" stroke="var(--navy)" strokeWidth="1.5"/>)}
+          <circle cx="160" cy="70" r="8" fill="none" stroke="var(--red)" strokeWidth="2"/>
+          <line x1="152" y1="70" x2="168" y2="70" stroke="var(--red)" strokeWidth="2"/>
+          <line x1="160" y1="62" x2="160" y2="78" stroke="var(--red)" strokeWidth="2"/>
+          <text x="160" y="92" textAnchor="middle" fontFamily="Barlow Condensed" fontSize="10" fill="var(--navy)">CoG ✓ Centre</text>
+          <text x="160" y="128" textAnchor="middle" fontFamily="Barlow Condensed" fontSize="10" fill="var(--gray-400)">{(data.dims?.l/1000).toFixed(2)}m × {(data.dims?.w/1000).toFixed(2)}m × {(data.dims?.h/1000).toFixed(2)}m</text>
+        </svg>
+      </div>
+      <div className="form-section">
+        <div className="form-section-title">Special Characteristics</div>
+        <div className="form-group"><label className="form-label">Centre of Gravity</label><input className="form-input" value={data.cog} onChange={e=>update("cog",e.target.value)} /></div>
+        <div className="form-group" style={{marginTop:12}}><label className="form-label">Attachment Points</label><input className="form-input" value={data.attachments} onChange={e=>update("attachments",e.target.value)} /></div>
+        <div className="form-group" style={{marginTop:12}}><label className="form-label">Special Handling Notes</label><textarea className="form-textarea" value={data.special} onChange={e=>update("special",e.target.value)} /></div>
+      </div>
+    </div>
+  );
+}
+
+// ─── STEP 4 ───────────────────────────────────────────────────────────────────
+function Step4({ data, update }) {
+  const selectedCrane = CRANE_DATABASE[data.craneModel];
+  const configs = selectedCrane ? Object.keys(selectedCrane.configs) : [];
+  const radii = selectedCrane && data.config && selectedCrane.configs[data.config]
+    ? Object.keys(selectedCrane.configs[data.config]).map(Number).sort((a,b)=>a-b)
+    : [];
+  const weightT = 38.5;
+
+  const handleCraneChange = (model) => {
+    const crane = CRANE_DATABASE[model];
+    update("craneModel", model);
+    if (crane) {
+      update("swl", crane.maxSWL);
+      update("config", Object.keys(crane.configs)[0]);
+      update("craneType", crane.type);
+    }
+  };
+
+  return (
+    <div>
+      <div className="form-section">
+        <div className="form-section-title">Crane Selection — Database ({Object.keys(CRANE_DATABASE).length} models)</div>
+        <div className="form-grid">
+          <div className="form-group form-full">
+            <label className="form-label">Crane Model <span className="required">*</span></label>
+            <select className="form-select" value={data.craneModel} onChange={e=>handleCraneChange(e.target.value)}>
+              <option value="">— Select Crane from Database —</option>
+              {["mobile","crawler","tower","lattice","overhead"].map(type=>(
+                <optgroup key={type} label={`── ${type.toUpperCase()} CRANES ──`}>
+                  {Object.entries(CRANE_DATABASE).filter(([,c])=>c.type===type).map(([name,c])=>(
+                    <option key={name} value={name}>{name} — Max {c.maxSWL}T</option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+          {selectedCrane && (
+            <>
+              <div className="form-group form-full">
+                <label className="form-label">Configuration</label>
+                <select className="form-select" value={data.config} onChange={e=>update("config",e.target.value)}>
+                  {configs.map(cfg=><option key={cfg} value={cfg}>{cfg}</option>)}
+                </select>
+              </div>
+              <div className="form-group"><label className="form-label">Max SWL</label><input className="form-input" value={`${selectedCrane.maxSWL} Tonnes`} readOnly style={{opacity:0.8}}/></div>
+              <div className="form-group"><label className="form-label">Crane Type</label><input className="form-input" value={selectedCrane.type.toUpperCase()} readOnly style={{opacity:0.8}}/></div>
+              <div className="form-group form-full"><label className="form-label">Crane Specification</label><input className="form-input" value={selectedCrane.specs} readOnly style={{opacity:0.7,fontSize:12}}/></div>
+            </>
+          )}
+          <div className="form-group">
+            <label className="form-label">Working Radius (m)</label>
+            <input className="form-input" type="number" min={getMinRadius(data.craneModel,data.config)} max={getMaxRadius(data.craneModel,data.config)} value={data.radius} onChange={e=>update("radius",+e.target.value)}/>
+          </div>
+        </div>
+      </div>
+      {selectedCrane && data.config && (
+        <div className="form-section">
+          <div className="form-section-title">Load Chart — {data.craneModel} / {data.config}</div>
+          <div style={{overflowX:"auto"}}>
+            <table className="personnel-table">
+              <thead><tr><th>Radius (m)</th><th>Capacity (T)</th><th>Load 38.5T = % SWL</th><th>Status</th></tr></thead>
+              <tbody>
+                {radii.map(r=>{
+                  const cap = selectedCrane.configs[data.config][r];
+                  const pct = ((weightT/cap)*100).toFixed(1);
+                  const isActive = data.radius===r;
+                  const color = pct<75?"var(--green)":pct<90?"var(--amber)":"var(--red)";
+                  return (
+                    <tr key={r} style={{background:isActive?"rgba(245,195,0,0.1)":""}} onClick={()=>update("radius",r)} title="Click to select radius">
+                      <td style={{fontWeight:isActive?700:400,cursor:"pointer"}}>{r}m {isActive?"◄":""}</td>
+                      <td style={{fontWeight:600}}>{cap.toFixed(1)} T</td>
+                      <td><span style={{fontFamily:"var(--font-display)",fontSize:13,fontWeight:700,color}}>{pct}%</span></td>
+                      <td><span style={{fontFamily:"var(--font-display)",fontSize:11,fontWeight:700,color}}>{pct<75?"✅ SAFE":pct<90?"⚠ CAUTION":"⛔ OVER"}</span></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="alert alert-yellow" style={{marginTop:12}}>💡 Click any row to set working radius. Capacity interpolated from published load chart data.</div>
+        </div>
+      )}
+      <div className="form-section">
+        <div className="form-section-title">Rigging Gear</div>
+        <div style={{marginBottom:12}}>
+          <div className="equip-cat-title">Slings & Lifting Gear</div>
+          <div className="equip-options">
+            {RIGGING_GEAR.map(g=>(
+              <div key={g} className={`equip-option ${data.rigging?.includes(g)?"selected":""}`}
+                onClick={()=>{const c=data.rigging||[];update("rigging",c.includes(g)?c.filter(x=>x!==g):[...c,g]);}}>
+                {g}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div className="equip-cat-title">Shackles</div>
+          <div className="equip-options">
+            {SHACKLES_LIST.map(s=>(
+              <div key={s} className={`equip-option ${data.shackles?.includes(s)?"selected":""}`}
+                onClick={()=>{const c=data.shackles||[];update("shackles",c.includes(s)?c.filter(x=>x!==s):[...c,s]);}}>
+                {s}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── STEP 5 ───────────────────────────────────────────────────────────────────
+function Step5({ data, update }) {
+  return (
+    <div>
+      <div className="form-section">
+        <div className="form-section-title">Lift Zone Visualizer</div>
+        <svg viewBox="0 0 500 300" className="lift-zone-svg" style={{background:"#f0f2f5"}}>
+          <rect x="0" y="230" width="500" height="70" fill="#d4c9a8"/>
+          <text x="250" y="258" textAnchor="middle" fontFamily="Barlow Condensed" fontSize="12" fill="#8a7a5a">GROUND LEVEL</text>
+          <rect x="340" y="130" width="80" height="100" fill="var(--navy)" opacity="0.7"/>
+          <text x="380" y="185" textAnchor="middle" fontFamily="Barlow Condensed" fontSize="10" fill="white">STRUCTURE</text>
+          <rect x="60" y="200" width="40" height="30" fill="#555"/>
+          <rect x="73" y="100" width="8" height="100" fill="#666"/>
+          <line x1="77" y1="100" x2="180" y2="115" stroke="#888" strokeWidth="3"/>
+          <line x1="77" y1="100" x2="40" y2="110" stroke="#888" strokeWidth="2"/>
+          <text x="80" y="260" textAnchor="middle" fontFamily="Barlow Condensed" fontSize="11" fill="var(--navy)" fontWeight="700">CRANE</text>
+          <line x1="180" y1="115" x2="180" y2="165" stroke="#888" strokeWidth="1.5" strokeDasharray="4,3"/>
+          <rect x="160" y="165" width="40" height="30" fill="var(--yellow)" stroke="var(--navy)" strokeWidth="2"/>
+          <text x="180" y="183" textAnchor="middle" fontFamily="Barlow Condensed" fontSize="10" fill="var(--navy)" fontWeight="700">LOAD</text>
+          <circle cx="180" cy="230" r={Math.min((data.exclusionRadius||15)*3,80)} fill="rgba(231,76,60,0.08)" stroke="var(--red)" strokeWidth="1.5" strokeDasharray="6,4"/>
+          <text x="180" y="200" textAnchor="middle" fontFamily="Barlow Condensed" fontSize="10" fill="var(--red)">EXCL. {data.exclusionRadius}m</text>
+          <line x1="0" y1="80" x2="500" y2="80" stroke="var(--red)" strokeWidth="2" strokeDasharray="10,5"/>
+          <text x="420" y="74" fontFamily="Barlow Condensed" fontSize="11" fill="var(--red)">⚡ OVERHEAD</text>
+          <path d="M 180 165 Q 220 120 260 145 L 290 165" fill="none" stroke="var(--navy)" strokeWidth="2" strokeDasharray="4,3"/>
+          <text x="230" y="128" textAnchor="middle" fontFamily="Barlow Condensed" fontSize="11" fill="var(--navy)">LIFT PATH</text>
+        </svg>
+      </div>
+      <div className="form-section">
+        <div className="form-section-title">Zone Parameters</div>
+        <div className="form-grid">
+          <div className="form-group"><label className="form-label">Exclusion Zone Radius (m)</label><input className="form-input" type="number" value={data.exclusionRadius} onChange={e=>update("exclusionRadius",+e.target.value)}/></div>
+          <div className="form-group"><label className="form-label">Ground Bearing Capacity (kN/m²)</label><input className="form-input" type="number" value={data.groundBearing} onChange={e=>update("groundBearing",+e.target.value)}/></div>
+          <div className="form-group form-full"><label className="form-label">Overhead Obstructions</label><input className="form-input" value={data.obstructions} onChange={e=>update("obstructions",e.target.value)}/></div>
+          <div className="form-group form-full"><label className="form-label">Lift Path Description</label><textarea className="form-textarea" rows={2} value={data.liftPath} onChange={e=>update("liftPath",e.target.value)}/></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── STEP 6 ───────────────────────────────────────────────────────────────────
+function Step6({ risks }) {
+  const getRiskLevel = s => s<=4?"low":s<=9?"medium":s<=16?"high":"critical";
+  return (
+    <div>
+      <div className="form-section">
+        <div className="form-section-title">Risk Matrix (5×5)</div>
+        <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
+          <div>
+            <div style={{fontFamily:"var(--font-display)",fontSize:11,color:"var(--gray-400)",letterSpacing:2,marginBottom:6,textTransform:"uppercase"}}>Likelihood → / Severity ↑</div>
+            <div style={{display:"grid",gridTemplateColumns:"auto repeat(5, 32px)",gap:3,alignItems:"center"}}>
+              <div/>
+              {[1,2,3,4,5].map(l=><div key={l} style={{textAlign:"center",fontFamily:"var(--font-display)",fontSize:10,fontWeight:700,color:"var(--gray-400)"}}>L{l}</div>)}
+              {[5,4,3,2,1].map(sev=>(
+                <React.Fragment key={sev}>
+                  <div style={{fontFamily:"var(--font-display)",fontSize:10,fontWeight:700,color:"var(--gray-400)",paddingRight:6}}>S{sev}</div>
+                  {[1,2,3,4,5].map(lik=>{
+                    const score=lik*sev;
+                    const colors={low:"#2ECC71",medium:"#F39C12",high:"#E74C3C",critical:"#8B0000"};
+                    return <div key={`${sev}-${lik}`} style={{width:32,height:32,background:colors[getRiskLevel(score)],borderRadius:3,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--font-display)",fontSize:10,fontWeight:700,color:"white"}}>{score}</div>;
+                  })}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+          <div style={{flex:1}}>
+            {[{l:"LOW ≤4",c:"var(--green)",d:"Monitor, routine controls"},{l:"MEDIUM 5–9",c:"var(--amber)",d:"Control measures required"},{l:"HIGH 10–16",c:"var(--red)",d:"Significant controls, AP oversight"},{l:"CRITICAL ≥17",c:"#8B0000",d:"STOP — Senior AP authorisation"}].map(r=>(
+              <div key={r.l} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                <div style={{width:14,height:14,background:r.c,borderRadius:2,flexShrink:0}}/>
+                <div><div style={{fontFamily:"var(--font-display)",fontSize:12,fontWeight:700,color:r.c}}>{r.l}</div><div style={{fontSize:11,color:"var(--gray-600)"}}>{r.d}</div></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="form-section">
+        <div className="form-section-title">Hazard Register</div>
+        <div className="scrollable">
+          {risks.map(r=>{
+            const score=r.likelihood*r.severity; const level=getRiskLevel(score); const resScore=r.residual*2;
+            return (
+              <div key={r.id} className={`hazard-card ${level}`}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
+                  <div className="hazard-title">{r.hazard}</div>
+                  <div style={{display:"flex",gap:4,marginLeft:8,flexShrink:0}}>
+                    <span className={`risk-pill risk-${level}`}>Initial: {score}</span>
+                    <span className={`risk-pill risk-${getRiskLevel(resScore)}`}>Residual: {resScore}</span>
+                  </div>
+                </div>
+                <div style={{fontSize:12,color:"var(--navy)",lineHeight:1.5}}><strong>Controls:</strong> {r.control}</div>
+              </div>
+            );
+          })}
+        </div>
+        <button className="btn-secondary" style={{marginTop:12,fontSize:13}}>+ Add Hazard</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── STEP 7 ───────────────────────────────────────────────────────────────────
+function Step7({ steps }) {
+  return (
+    <div>
+      <div className="form-section">
+        <div className="form-section-title">Lift Sequence</div>
+        {steps.map(s=>(
+          <div key={s.id} className="method-step">
+            <div className="method-step-num">{s.id}</div>
+            <div><div className="method-step-tag">{s.tag}</div><div className="method-step-text">{s.text}</div></div>
+          </div>
+        ))}
+        <button className="btn-secondary" style={{marginTop:12,fontSize:13}}>+ Add Step</button>
+      </div>
+      <div className="form-section">
+        <div className="form-section-title">Communication Protocol</div>
+        <table className="personnel-table">
+          <thead><tr><th>Signal</th><th>Meaning</th><th>Method</th></tr></thead>
+          <tbody>
+            {[["🟢 Thumbs up / green flag","All clear to commence","Visual + Radio"],["🔴 Red flag raised","STOP — hold immediately","Visual + Radio"],["✋ Open palm","Slow / cautious movement","Visual"],["📻 Channel 7","Primary lift radio channel","Radio"],["🚨 ABORT","Immediate stop — all ops cease","Verbal + Radio"]].map(([s,m,t])=>(
+              <tr key={s}><td>{s}</td><td>{m}</td><td><span className="info-tag">{t}</span></td></tr>
+            ))}
           </tbody>
         </table>
       </div>
+      <div className="form-section">
+        <div className="form-section-title">Abort Criteria</div>
+        {["Wind speed exceeds 38 km/h (10.5 m/s)","Any person enters exclusion zone","Load shows unexpected movement or rotation","Loss of communication with crane operator","Ground instability or outrigger movement","Equipment malfunction or unusual crane noise","Any team member raises a safety concern"].map((c,i)=>(
+          <div key={i} style={{display:"flex",gap:10,padding:"6px 0",borderBottom:"1px solid var(--gray-100)"}}>
+            <span style={{color:"var(--red)",fontWeight:700}}>!</span>
+            <span style={{fontSize:13}}>{c}</span>
+          </div>
+        ))}
+      </div>
     </div>
-  </section>
+  );
+}
 
-  <!-- CONTRIBUTE -->
-  <section id="contribute" class="contribute-section">
-    <div class="container">
-      <div class="section-label">Open Source</div>
-      <h2 class="section-title">Built by engineers,<br>for <span>engineers</span></h2>
+// ─── STEP 8 ───────────────────────────────────────────────────────────────────
+function Step8({ planData, onFinish }) {
+  const [open, setOpen] = useState("project");
+  const [sigs, setSigs] = useState({ ap:false, supervisor:false, client:false });
+  const sections = [
+    { key:"project",   label:"Project & Site", fields:[["Project",planData.project.name],["Site",planData.project.site],["Client",planData.project.client],["Lift Date",planData.project.date],["Start Time",planData.project.time]] },
+    { key:"personnel", label:"Personnel",      fields:[["AP",planData.personnel.ap.name],["AP Cert",planData.personnel.ap.cert],["Operator",planData.personnel.operator.name],["Banksman",planData.personnel.banksman?.split("—")[0]]] },
+    { key:"load",      label:"Load & Equipment", fields:[["Description",planData.load.description],["Weight",`${planData.load.weight.toLocaleString()} kg`],["Crane",planData.equipment.craneModel],["Config",planData.equipment.config],["Radius",`${planData.equipment.radius}m`]] },
+  ];
+  return (
+    <div>
+      <div className="alert alert-green">✅ Lifting Plan LP-2025-0863 ready for sign-off. All 7 sections completed.</div>
+      {sections.map(sec=>(
+        <div key={sec.key} className="review-section">
+          <div className="review-section-header" onClick={()=>setOpen(open===sec.key?null:sec.key)}>
+            <span>{sec.label}</span><span>{open===sec.key?"▲":"▼"}</span>
+          </div>
+          {open===sec.key && (
+            <div className="review-section-body">
+              {sec.fields.map(([l,v])=>v&&<div key={l}><div className="review-field-label">{l}</div><div className="review-field-value">{v}</div></div>)}
+            </div>
+          )}
+        </div>
+      ))}
+      <div style={{marginTop:24}}>
+        <div style={{fontFamily:"var(--font-display)",fontSize:13,fontWeight:700,color:"var(--yellow)",letterSpacing:3,textTransform:"uppercase",marginBottom:16}}>Digital Sign-Off</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:16}}>
+          {[{key:"ap",role:"Appointed Person",name:planData.personnel.ap.name},{key:"supervisor",role:"Lifting Supervisor",name:"Hassan Al-Farouqi CMIOSH"},{key:"client",role:"Client Representative",name:"Nadia Karimi BSc"}].map(sig=>(
+            <div key={sig.key}>
+              <div style={{fontSize:11,color:"var(--gray-400)",textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>{sig.role}</div>
+              <div className={`sig-block ${sigs[sig.key]?"signed":""}`} onClick={()=>setSigs(s=>({...s,[sig.key]:!s[sig.key]}))}>
+                {sigs[sig.key]?<><div className="sig-name">{sig.name.split(" ").slice(0,2).join(" ")}</div><div style={{fontSize:11,color:"var(--green)",marginTop:4}}>✅ {new Date().toLocaleDateString("en-GB")}</div></>:<><div style={{fontSize:24}}>✍</div><div style={{fontSize:12,color:"var(--gray-400)"}}>Tap to sign</div></>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{display:"flex",gap:12,marginTop:24,flexWrap:"wrap"}}>
+        <button className="btn-primary" onClick={onFinish}>📄 Generate Lifting Plan</button>
+        <button className="btn-secondary" style={{color:"var(--navy)",borderColor:"var(--gray-200)"}}>💾 Save as Draft</button>
+      </div>
+    </div>
+  );
+}
 
-      <div class="contribute-box">
-        <h3 class="contribute-title">Want to improve it?<br>You're welcome here.</h3>
-        <p class="contribute-desc">
-          This project is open source and actively looking for contributions from the lifting engineering community.
-          Whether you're an AP, a rigging supervisor, or a software engineer who works in the industry — your input shapes this tool.
-        </p>
-
-        <div class="contribute-ways">
-          <div class="way-item">
-            <div class="way-icon">🏗️</div>
-            <div class="way-text"><strong>Add Crane Models</strong>Submit load chart data for cranes not yet in the database.</div>
+// ─── PLAN PREVIEW ─────────────────────────────────────────────────────────────
+function PlanPreview({ planData, onBack }) {
+  const dateStr = new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"});
+  const capAtRadius = getCapacityAtRadius(planData.equipment.craneModel,planData.equipment.config,planData.equipment.radius);
+  const pctSWL = capAtRadius ? ((planData.load.weight/1000/capAtRadius)*100).toFixed(1) : "N/A";
+  return (
+    <div style={{maxWidth:900,margin:"0 auto",padding:"32px"}}>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:24}}>
+        <button className="btn-nav prev" onClick={onBack}>← Back to Wizard</button>
+        <button className="btn-primary">📄 Export PDF</button>
+      </div>
+      <div style={{background:"var(--navy-dark)",borderRadius:8,padding:48,marginBottom:24,position:"relative",overflow:"hidden",borderBottom:"4px solid var(--yellow)"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:40}}>
+          <div>
+            <div style={{fontFamily:"var(--font-display)",fontSize:12,color:"var(--yellow)",letterSpacing:3,marginBottom:8,textTransform:"uppercase"}}>Lifting Plan Document — LOLER 1998 / BS 7121</div>
+            <div style={{fontFamily:"var(--font-display)",fontSize:36,fontWeight:900,color:"white",lineHeight:1.1,marginBottom:8}}>{planData.project.name}</div>
+            <div style={{fontSize:14,color:"var(--gray-400)"}}>{planData.project.site}</div>
           </div>
-          <div class="way-item">
-            <div class="way-icon">📋</div>
-            <div class="way-text"><strong>Improve Standards</strong>Flag outdated EN/BS data or suggest missing standards coverage.</div>
-          </div>
-          <div class="way-item">
-            <div class="way-icon">🐛</div>
-            <div class="way-text"><strong>Report Bugs</strong>Found a calculation error or UI issue? Open a GitHub issue.</div>
-          </div>
-          <div class="way-item">
-            <div class="way-icon">🌍</div>
-            <div class="way-text"><strong>Translate</strong>Help translate the interface — Arabic, French, German needed.</div>
-          </div>
-          <div class="way-item">
-            <div class="way-icon">📄</div>
-            <div class="way-text"><strong>PDF Export</strong>Build a print-ready LOLER-compliant PDF output from the plan.</div>
-          </div>
-          <div class="way-item">
-            <div class="way-icon">💡</div>
-            <div class="way-text"><strong>Feature Ideas</strong>Anything you wish existed in a lifting plan tool — suggest it.</div>
+          <div style={{background:"var(--yellow)",padding:"12px 20px",borderRadius:4,textAlign:"center",flexShrink:0,marginLeft:24}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:11,fontWeight:700,color:"var(--navy-dark)",letterSpacing:2,textTransform:"uppercase"}}>Plan Reference</div>
+            <div style={{fontFamily:"var(--font-display)",fontSize:22,fontWeight:900,color:"var(--navy-dark)"}}>LP-2025-0863</div>
+            <div style={{fontFamily:"var(--font-display)",fontSize:11,color:"var(--navy-dark)"}}>Rev: 1.0</div>
           </div>
         </div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:1,background:"rgba(255,255,255,0.05)",borderRadius:4,overflow:"hidden"}}>
+          {[["Appointed Person",planData.personnel.ap.name],["Date of Lift",planData.project.date],["Crane",planData.equipment.craneModel],["SWL Utilisation",`${pctSWL}% @ ${planData.equipment.radius}m`]].map(([l,v])=>(
+            <div key={l} style={{padding:"14px 16px",background:"rgba(255,255,255,0.04)"}}>
+              <div style={{fontFamily:"var(--font-display)",fontSize:10,color:"var(--yellow)",letterSpacing:2,textTransform:"uppercase",marginBottom:4}}>{l}</div>
+              <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:"white"}}>{v}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {[
+        { title:"1. Executive Summary", content:<p style={{fontSize:14,lineHeight:1.7}}>This Lifting Plan has been prepared by <strong>{planData.personnel.ap.name}</strong> ({planData.personnel.ap.cert}) for the controlled lift of a <strong>{planData.load.description}</strong> weighing <strong>{planData.load.weight.toLocaleString()} kg ({(planData.load.weight/1000).toFixed(3)} T)</strong>. The planned lift date is <strong>{planData.project.date}</strong> at <strong>{planData.project.time}</strong>. A <strong>{planData.equipment.craneModel}</strong> will be deployed at <strong>{planData.equipment.radius}m radius</strong> with a rated capacity of <strong>{capAtRadius?capAtRadius.toFixed(1):"—"} T</strong>, giving an SWL utilisation of <strong>{pctSWL}%</strong>. Exclusion zone: <strong>{planData.liftZone.exclusionRadius}m radius</strong>.</p> },
+        { title:"2. Personnel & Responsibilities", content:<table className="personnel-table" style={{width:"100%"}}><thead><tr><th>Role</th><th>Name</th><th>Certification</th></tr></thead><tbody><tr><td>Appointed Person</td><td>{planData.personnel.ap.name}</td><td>{planData.personnel.ap.cert}</td></tr><tr><td>Crane Operator</td><td>{planData.personnel.operator.name}</td><td>{planData.personnel.operator.cert}</td></tr>{planData.personnel.riggers.map(r=><tr key={r.name}><td>Rigger</td><td>{r.name}</td><td>LEEA Level 3 — {r.level}</td></tr>)}<tr><td>Banksman</td><td>{planData.personnel.banksman?.split("—")[0]}</td><td>CPCS A40</td></tr></tbody></table> },
+        { title:"3. Risk Assessment Register", content:<div>{planData.risks.map(r=><div key={r.id} style={{display:"flex",gap:12,padding:"8px 0",borderBottom:"1px solid var(--gray-100)",fontSize:13}}><div style={{minWidth:20,fontWeight:700,color:"var(--gray-400)"}}>{r.id}.</div><div style={{flex:1}}><div style={{fontWeight:600,marginBottom:2}}>{r.hazard}</div><div style={{color:"var(--gray-600)"}}>{r.control}</div></div><div style={{display:"flex",gap:4,flexShrink:0}}><span style={{background:"rgba(231,76,60,0.1)",color:"var(--red)",padding:"2px 6px",borderRadius:3,fontFamily:"var(--font-display)",fontSize:10,fontWeight:700}}>{r.likelihood*r.severity}</span><span style={{background:"rgba(46,204,113,0.1)",color:"var(--green-dark)",padding:"2px 6px",borderRadius:3,fontFamily:"var(--font-display)",fontSize:10,fontWeight:700}}>R:{r.residual*2}</span></div></div>)}</div> },
+        { title:"4. Method Statement", content:<div>{planData.method.map(s=><div key={s.id} style={{display:"flex",gap:16,padding:"10px 0",borderBottom:"1px solid var(--gray-100)"}}><div style={{width:28,height:28,background:"var(--navy)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--font-display)",fontWeight:700,color:"var(--yellow)",flexShrink:0}}>{s.id}</div><div><div style={{fontFamily:"var(--font-display)",fontSize:11,color:"var(--yellow)"}}>{s.tag}</div><div style={{fontSize:14,lineHeight:1.6}}>{s.text}</div></div></div>)}</div> },
+      ].map(sec=>(
+        <div key={sec.title} style={{background:"white",borderRadius:6,marginBottom:16,overflow:"hidden",boxShadow:"0 2px 8px rgba(0,0,0,0.06)"}}>
+          <div style={{background:"var(--navy)",padding:"12px 20px",fontFamily:"var(--font-display)",fontSize:15,fontWeight:700,color:"white",borderBottom:"3px solid var(--yellow)"}}>{sec.title}</div>
+          <div style={{padding:20}}>{sec.content}</div>
+        </div>
+      ))}
+      <div style={{background:"var(--navy-dark)",padding:"14px 24px",borderRadius:6,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <span style={{fontSize:12,color:"var(--gray-400)"}}>LP-2025-0863 Rev 1.0 | {dateStr}</span>
+        <span style={{fontSize:12,color:"var(--gray-400)"}}>Al-Rafidain Lifting Solutions Ltd | LOLER 1998 Compliant</span>
+        <span style={{fontSize:12,color:"var(--gray-400)"}}>{planData.personnel.ap.name}</span>
+      </div>
+    </div>
+  );
+}
 
-        <div class="contribute-btns">
-          <a href="https://github.com/YOUR_USERNAME/liftplan-pro" target="_blank" class="btn-github">⭐ Star &amp; Fork on GitHub</a>
-          <a href="https://github.com/YOUR_USERNAME/liftplan-pro/issues/new" target="_blank" class="btn-issue">🐛 Open an Issue</a>
-          <a href="https://linkedin.com/in/mahmoud-galal-0a771a146" target="_blank" class="btn-issue">💼 Connect on LinkedIn</a>
+// ─── SIDEBAR: CAPACITY CALCULATOR ─────────────────────────────────────────────
+function CapacityCalculator({ equipment, loadWeight }) {
+  const [radius, setRadius] = useState(equipment.radius||18);
+  const minR = getMinRadius(equipment.craneModel,equipment.config);
+  const maxR = getMaxRadius(equipment.craneModel,equipment.config);
+  const capAtRadius = getCapacityAtRadius(equipment.craneModel,equipment.config,radius);
+  const weightT = (loadWeight||38500)/1000;
+  const pct = capAtRadius ? Math.min((weightT/capAtRadius)*100,200) : 0;
+  const status = !capAtRadius?"red":pct<75?"green":pct<90?"amber":"red";
+  const statusText = !capAtRadius?"BEYOND RANGE":pct<75?"SAFE":pct<90?"CAUTION":"OVERLOAD ⛔";
+  const colors = { green:"var(--green)", amber:"var(--amber)", red:"var(--red)" };
+  return (
+    <div className="sidebar-card">
+      <div className="sidebar-card-header">⚖ Live Capacity Calculator</div>
+      <div className="sidebar-card-body">
+        <div style={{marginBottom:8}}>
+          <div style={{fontFamily:"var(--font-display)",fontSize:11,fontWeight:600,color:"var(--navy)",marginBottom:4}}>{equipment.craneModel||"No crane selected"}</div>
+          <div style={{fontSize:10,color:"var(--gray-400)"}}>{equipment.config||"—"}</div>
+        </div>
+        <div className="calc-label">Working Radius: {radius}m (range: {minR}–{maxR}m)</div>
+        <input type="range" min={minR} max={maxR} step={1} value={radius} onChange={e=>setRadius(+e.target.value)} style={{width:"100%",accentColor:"var(--yellow)",margin:"6px 0"}}/>
+        <div className="capacity-bar">
+          <div className="capacity-fill" style={{width:`${Math.min(pct,100)}%`,background:colors[status]}}/>
+        </div>
+        <div style={{textAlign:"center",marginBottom:8}}>
+          <div style={{fontFamily:"var(--font-display)",fontSize:36,fontWeight:900,color:colors[status]}}>{capAtRadius?`${pct.toFixed(1)}%`:"N/A"}</div>
+          <div style={{fontFamily:"var(--font-display)",fontSize:13,fontWeight:700,color:colors[status],letterSpacing:2}}>{statusText}</div>
+          {capAtRadius && <div style={{fontSize:11,color:"var(--gray-400)",marginTop:2}}>{weightT.toFixed(2)}T of {capAtRadius.toFixed(1)}T rated @ {radius}m</div>}
+          {!capAtRadius && <div style={{fontSize:11,color:"var(--red)",marginTop:2}}>Radius {radius}m exceeds crane range</div>}
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+          {[["Crane Capacity",capAtRadius?`${capAtRadius.toFixed(1)} T`:"N/A"],["Load Weight",`${weightT.toFixed(2)} T`],["Headroom",capAtRadius?`${Math.max(capAtRadius-weightT,0).toFixed(1)} T`:"—"],["Utilisation",capAtRadius?`${pct.toFixed(0)}%`:"—"]].map(([l,v])=>(
+            <div key={l} style={{background:"var(--gray-100)",padding:"6px 8px",borderRadius:3}}>
+              <div style={{fontSize:10,color:"var(--gray-400)",textTransform:"uppercase",letterSpacing:1}}>{l}</div>
+              <div style={{fontFamily:"var(--font-display)",fontSize:13,fontWeight:700,color:"var(--navy)"}}>{v}</div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
-  </section>
+  );
+}
 
-  <!-- AUTHOR -->
-  <section class="author-section">
-    <div class="container">
-      <div class="section-label">About the author</div>
-      <div class="author-card">
-        <div class="author-avatar">ME</div>
-        <div class="author-info">
-          <div class="author-name">Mahmoud Elsayed</div>
-          <div class="author-role">Mechanical Engineer · Lifting Equipment Specialist · CFD Engineer</div>
-          <div class="author-certs">
-            <span class="cert-tag">LEEA-AP-04421</span>
-            <span class="cert-tag">CMIOSH</span>
-            <span class="cert-tag">CPCS A62</span>
-            <span class="cert-tag">ANSYS Fluent</span>
-            <span class="cert-tag">OpenFOAM</span>
+// ─── SIDEBAR: WEATHER ─────────────────────────────────────────────────────────
+function WeatherWidget({ data }) {
+  const wind = parseFloat(data?.wind||0);
+  const flag = wind>38?"danger":wind>25?"warn":"ok";
+  const flagText = wind>38?"⛔ SUSPEND LIFT":wind>25?"⚠ MONITOR WIND":"✅ CONDITIONS OK";
+  return (
+    <div className="sidebar-card">
+      <div className="sidebar-card-header">🌤 Weather Status</div>
+      <div className="sidebar-card-body">
+        <div className="weather-row">
+          <div className="weather-item"><div className="weather-value">{data?.wind||"—"}</div><div className="weather-label">km/h Wind</div></div>
+          <div className="weather-item"><div className="weather-value">{data?.temp||"—"}°</div><div className="weather-label">Temp °C</div></div>
+          <div className="weather-item"><div className="weather-value" style={{fontSize:20}}>{data?.condition==="Clear"?"☀":data?.condition==="Overcast"?"☁":data?.condition?.includes("Rain")?"🌧":"❄"}</div><div className="weather-label">{data?.condition}</div></div>
+        </div>
+        <div className={`weather-flag ${flag}`}>{flagText}</div>
+        <div style={{fontSize:11,color:"var(--gray-400)",marginTop:6}}>Limit: 38 km/h | Vis: {data?.visibility}</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SIDEBAR: SLING ANGLE ─────────────────────────────────────────────────────
+function SlingAngleDiagram() {
+  const [angle, setAngle] = useState(60);
+  const rad = (angle*Math.PI)/180;
+  const tension = (38.5/(2*Math.cos(rad))).toFixed(1);
+  const derating = angle>=60?1.0:angle>=45?0.866:angle>=30?0.707:0.5;
+  const spread = Math.min(2*60*Math.cos(rad),110);
+  const cx = 150;
+  return (
+    <div className="sidebar-card">
+      <div className="sidebar-card-header">📐 Sling Angle Visualizer</div>
+      <div className="sidebar-card-body">
+        <svg viewBox="0 0 300 150" style={{width:"100%"}}>
+          <circle cx={cx} cy={20} r="7" fill="var(--navy)"/>
+          <text x={cx} y={11} textAnchor="middle" fontFamily="Barlow Condensed" fontSize="9" fill="var(--gray-600)">HOOK</text>
+          <line x1={cx} y1={27} x2={cx-spread/2} y2={112} stroke="var(--yellow)" strokeWidth="3" strokeLinecap="round"/>
+          <line x1={cx} y1={27} x2={cx+spread/2} y2={112} stroke="var(--yellow)" strokeWidth="3" strokeLinecap="round"/>
+          <rect x={cx-38} y={112} width="76" height="26" fill="var(--navy)" rx="2"/>
+          <text x={cx} y={129} textAnchor="middle" fontFamily="Barlow Condensed" fontSize="10" fill="white" fontWeight="700">LOAD 38.5T</text>
+          <text x={cx-16} y={46} fontFamily="Barlow Condensed" fontSize="12" fill="var(--red)" fontWeight="700">{angle}°</text>
+          <text x={cx-spread/4-30} y={(27+112)/2} fontFamily="Barlow Condensed" fontSize="10" fill="var(--yellow)" fontWeight="700">{tension}T</text>
+          <text x={cx+spread/4+2} y={(27+112)/2} fontFamily="Barlow Condensed" fontSize="10" fill="var(--yellow)" fontWeight="700">{tension}T</text>
+        </svg>
+        <input type="range" min="15" max="85" value={angle} onChange={e=>setAngle(+e.target.value)} style={{width:"100%",accentColor:"var(--yellow)"}}/>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginTop:8}}>
+          {[["Sling Angle",`${angle}°`],["De-rating",`× ${derating.toFixed(3)}`],["Leg Tension",`${tension} T`],["Min Angle","≥30° (rec ≥45°)"]].map(([l,v])=>(
+            <div key={l} style={{background:"var(--gray-100)",padding:"5px 8px",borderRadius:3}}>
+              <div style={{fontSize:10,color:"var(--gray-400)",textTransform:"uppercase",letterSpacing:1}}>{l}</div>
+              <div style={{fontFamily:"var(--font-display)",fontSize:12,fontWeight:700,color:angle<30?"var(--red)":"var(--navy)"}}>{v}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SIDEBAR: CHECKLIST ───────────────────────────────────────────────────────
+function ChecklistWidget({ checks, updatePlan }) {
+  const done = checks.filter(Boolean).length;
+  const pct = Math.round((done/EQUIPMENT_CHECKS.length)*100);
+  return (
+    <div className="sidebar-card">
+      <div className="sidebar-card-header">✅ Pre-Lift Checklist ({done}/{EQUIPMENT_CHECKS.length})</div>
+      <div className="sidebar-card-body">
+        <div className="capacity-bar">
+          <div className="capacity-fill" style={{width:`${pct}%`,background:pct===100?"var(--green)":pct>70?"var(--amber)":"var(--red)"}}/>
+        </div>
+        <div style={{fontFamily:"var(--font-display)",fontSize:12,fontWeight:700,color:pct===100?"var(--green)":"var(--amber)",marginBottom:8,marginTop:4}}>
+          {pct===100?"✅ ALL CHECKS PASSED":`${pct}% Complete`}
+        </div>
+        <div className="scrollable" style={{maxHeight:200}}>
+          {EQUIPMENT_CHECKS.map((item,i)=>(
+            <div key={i} className="checklist-item" onClick={()=>{const n=[...checks];n[i]=!n[i];updatePlan("checks",n);}}>
+              <div className={`check-box ${checks[i]?"checked":""}`}>{checks[i]&&<span style={{color:"white",fontSize:12}}>✓</span>}</div>
+              <span className={`check-text ${checks[i]?"checked":""}`}>{item}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── LEEA TAB WRAPPER ─────────────────────────────────────────────────────────
+function LeaTabShell({ children }) {
+  return (
+    <div className="dark-panel">
+      <div className="dark-content">{children}</div>
+      <div style={{borderTop:"1px solid #1e3a5f",padding:"12px 28px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <span style={{fontSize:10,color:"#334e7a",letterSpacing:2,fontFamily:"var(--font-mono)"}}>LEEA LIFTING PORTAL — EN13414 · EN818 · BS4278 · EN1492</span>
+        <span style={{fontSize:10,color:"#334e7a",fontFamily:"var(--font-mono)"}}>⚠️ FOR REFERENCE ONLY — VERIFY WITH QUALIFIED LIFTING ENGINEER</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── TAB: CRANE AI ANALYSIS ───────────────────────────────────────────────────
+function CraneAnalysisTab() {
+  const [craneFile, setCraneFile] = useState(null);
+  const [craneData, setCraneData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = useCallback(async (file) => {
+    if (!file) return;
+    setCraneFile(file); setLoading(true); setError(null); setCraneData(null);
+    try {
+      const base64 = await new Promise((res,rej)=>{
+        const r = new FileReader();
+        r.onload = ()=>res(r.result.split(",")[1]);
+        r.onerror = ()=>rej(new Error("File read failed"));
+        r.readAsDataURL(file);
+      });
+      const isImage = file.type.startsWith("image/");
+      const mediaType = isImage ? file.type : "application/pdf";
+      const systemPrompt = `You are an expert lifting equipment engineer with deep knowledge of LEEA standards. Extract ALL relevant data from this crane/lifting equipment data sheet and return ONLY a valid JSON object. No preamble or markdown.
+Return this exact structure:
+{"equipmentName":"string","manufacturer":"string","serialNumber":"string","model":"string","capacity":{"value":number,"unit":"t"},"span":{"value":number,"unit":"m"},"liftHeight":{"value":number,"unit":"m"},"craneType":"string","hoistSpeed":{"value":number,"unit":"m/min"},"traverseSpeed":{"value":number,"unit":"m/min"},"travelSpeed":{"value":number,"unit":"m/min"},"power":{"value":number,"unit":"kW"},"voltage":"string","dutyCycle":"string","weight":{"value":number,"unit":"t"},"manufacturer_date":"string","nextInspection":"string","swlChart":[{"radius":number,"swl":number}],"hoistMotor":{"power":number,"speed":number},"classification":"string","safetyDevices":["string"],"certifications":["string"],"additionalNotes":"string","rawExtracted":["string"]}
+Use null for any field not found.`;
+      const contentBlock = isImage
+        ? { type:"image", source:{ type:"base64", media_type:mediaType, data:base64 } }
+        : { type:"document", source:{ type:"base64", media_type:"application/pdf", data:base64 } };
+      const response = await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:2000, system:systemPrompt,
+          messages:[{ role:"user", content:[contentBlock,{type:"text",text:"Extract all crane/lifting equipment data from this document."}] }] }),
+      });
+      const data = await response.json();
+      const text = data.content?.map(i=>i.text||"").join("")||"";
+      const clean = text.replace(/```json|```/g,"").trim();
+      setCraneData(JSON.parse(clean));
+    } catch(e) { setError("Failed to analyse document: "+e.message); }
+    finally { setLoading(false); }
+  }, []);
+
+  const handleDrop = useCallback((e)=>{ e.preventDefault(); const f=e.dataTransfer.files[0]; if(f) handleFileUpload(f); },[handleFileUpload]);
+
+  return (
+    <LeaTabShell>
+      <div className="fade-in">
+        <div style={{marginBottom:20}}>
+          <h2 style={{fontFamily:"var(--font-display)",fontSize:22,fontWeight:800,color:"#f59e0b",margin:0,letterSpacing:2}}>CRANE DATA SHEET ANALYSIS</h2>
+          <p style={{color:"#64748b",fontSize:12,margin:"4px 0 0",letterSpacing:1,fontFamily:"var(--font-mono)"}}>Upload a crane data sheet (PDF or image) — AI extracts all technical parameters automatically</p>
+        </div>
+        <div className="upload-zone" onDragOver={e=>e.preventDefault()} onDrop={handleDrop} onClick={()=>fileInputRef.current?.click()}>
+          <input ref={fileInputRef} type="file" accept=".pdf,image/*" style={{display:"none"}} onChange={e=>handleFileUpload(e.target.files[0])}/>
+          {loading ? (
+            <div><div className="spin" style={{fontSize:36,marginBottom:12}}>⚙️</div><p style={{color:"#f59e0b",fontSize:13,letterSpacing:2,fontFamily:"var(--font-mono)"}}>ANALYSING DOCUMENT WITH AI...</p><p style={{color:"#475569",fontSize:11}}>Extracting crane specifications, SWL charts, and technical data</p></div>
+          ) : craneFile ? (
+            <div><div style={{fontSize:36,marginBottom:8}}>📄</div><p style={{color:"#22d3ee",fontSize:13,fontFamily:"var(--font-mono)"}}>{craneFile.name}</p><p style={{color:"#475569",fontSize:11}}>Click or drop to replace</p></div>
+          ) : (
+            <div><div style={{fontSize:48,marginBottom:12}}>📋</div><p style={{color:"#94a3b8",fontSize:14,letterSpacing:1,fontFamily:"var(--font-mono)"}}>DROP CRANE DATA SHEET HERE</p><p style={{color:"#475569",fontSize:11,marginTop:6}}>Supports PDF and image files · AI-powered extraction</p></div>
+          )}
+        </div>
+        {error && <div style={{background:"#1a0505",border:"1px solid #ef4444",borderRadius:8,padding:"12px 16px",marginBottom:20,color:"#fca5a5",fontSize:12,fontFamily:"var(--font-mono)"}}>⚠️ {error}</div>}
+        {craneData && (
+          <div className="fade-in">
+            <div className="dark-card" style={{border:"1px solid #f59e0b",padding:"18px 22px",marginBottom:20}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:10}}>
+                <div>
+                  <div style={{fontFamily:"var(--font-display)",fontSize:26,fontWeight:800,color:"#f59e0b"}}>{craneData.equipmentName||"CRANE EQUIPMENT"}</div>
+                  <div style={{color:"#94a3b8",fontSize:12,marginTop:4,fontFamily:"var(--font-mono)"}}>
+                    {craneData.manufacturer&&<span style={{marginRight:16}}>MFR: {craneData.manufacturer}</span>}
+                    {craneData.model&&<span style={{marginRight:16}}>MODEL: {craneData.model}</span>}
+                    {craneData.serialNumber&&<span>S/N: {craneData.serialNumber}</span>}
+                  </div>
+                </div>
+                {craneData.capacity?.value && (
+                  <div style={{textAlign:"right"}}>
+                    <div style={{fontFamily:"var(--font-display)",fontSize:40,fontWeight:800,color:"#22d3ee",lineHeight:1}}>{craneData.capacity.value}<span style={{fontSize:18,color:"#64748b"}}> {craneData.capacity.unit}</span></div>
+                    <div style={{color:"#64748b",fontSize:11,letterSpacing:2,fontFamily:"var(--font-mono)"}}>MAX SWL</div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(175px,1fr))",gap:12,marginBottom:20}}>
+              {[
+                {label:"CRANE TYPE",    value:craneData.craneType,                                              icon:"🏗️"},
+                {label:"SPAN",         value:craneData.span?.value?`${craneData.span.value} ${craneData.span.unit}`:null, icon:"📏"},
+                {label:"LIFT HEIGHT",  value:craneData.liftHeight?.value?`${craneData.liftHeight.value} ${craneData.liftHeight.unit}`:null, icon:"📐"},
+                {label:"HOIST SPEED",  value:craneData.hoistSpeed?.value?`${craneData.hoistSpeed.value} m/min`:null, icon:"⚡"},
+                {label:"TRAVERSE",     value:craneData.traverseSpeed?.value?`${craneData.traverseSpeed.value} m/min`:null, icon:"↔️"},
+                {label:"DUTY CYCLE",   value:craneData.dutyCycle,                                               icon:"🔄"},
+                {label:"VOLTAGE",      value:craneData.voltage,                                                 icon:"⚡"},
+                {label:"POWER",        value:craneData.power?.value?`${craneData.power.value} kW`:null,        icon:"🔋"},
+                {label:"CRANE WEIGHT", value:craneData.weight?.value?`${craneData.weight.value} t`:null,       icon:"⚖️"},
+                {label:"NEXT INSP.",   value:craneData.nextInspection,                                         icon:"🗓️"},
+                {label:"CLASS",        value:craneData.classification,                                         icon:"🏷️"},
+              ].filter(s=>s.value).map((spec,i)=>(
+                <div key={i} className="dark-stat">
+                  <div className="dark-stat-label">{spec.icon} {spec.label}</div>
+                  <div className="dark-stat-value">{spec.value}</div>
+                </div>
+              ))}
+            </div>
+            {craneData.swlChart?.length > 1 && (
+              <div className="dark-card" style={{marginBottom:20}}>
+                <div className="dark-card-header"><span className="dark-section-label">📊 SWL vs RADIUS CHART</span><span style={{fontSize:10,color:"#475569",fontFamily:"var(--font-mono)"}}>Factor of Safety 4:1</span></div>
+                <div style={{overflowX:"auto"}}>
+                  <table className="dark-table">
+                    <thead><tr><th style={{textAlign:"left"}}>RADIUS (m)</th><th style={{textAlign:"right"}}>SWL (t)</th><th>CHART</th></tr></thead>
+                    <tbody>
+                      {craneData.swlChart.map((row,i)=>{
+                        const maxSwl=Math.max(...craneData.swlChart.map(r=>r.swl));
+                        const pct=(row.swl/maxSwl)*100;
+                        return (
+                          <tr key={i}>
+                            <td style={{color:"#94a3b8"}}>{row.radius}m</td>
+                            <td style={{color:"#22d3ee",textAlign:"right",fontWeight:700}}>{row.swl}t</td>
+                            <td><div style={{height:8,background:"#0d1f35",borderRadius:4,minWidth:120}}><div style={{height:8,background:"#f59e0b",borderRadius:4,width:`${pct}%`,transition:"width 0.5s"}}/></div></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+            {(craneData.safetyDevices?.length||craneData.certifications?.length) && (
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16}}>
+                {craneData.safetyDevices?.length>0 && (
+                  <div className="dark-card" style={{padding:"16px 20px"}}>
+                    <div className="dark-section-label" style={{marginBottom:12}}>🛡️ SAFETY DEVICES</div>
+                    {craneData.safetyDevices.map((d,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6,fontSize:12,fontFamily:"var(--font-mono)"}}><span style={{color:"#22d3ee"}}>✓</span><span style={{color:"#94a3b8"}}>{d}</span></div>)}
+                  </div>
+                )}
+                {craneData.certifications?.length>0 && (
+                  <div className="dark-card" style={{padding:"16px 20px"}}>
+                    <div className="dark-section-label" style={{marginBottom:12}}>📜 CERTIFICATIONS</div>
+                    {craneData.certifications.map((c,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6,fontSize:12,fontFamily:"var(--font-mono)"}}><span style={{color:"#f59e0b"}}>★</span><span style={{color:"#94a3b8"}}>{c}</span></div>)}
+                  </div>
+                )}
+              </div>
+            )}
+            {craneData.additionalNotes && <div className="dark-card" style={{padding:"12px 16px",fontSize:12,color:"#64748b",fontFamily:"var(--font-mono)"}}>📝 {craneData.additionalNotes}</div>}
+          </div>
+        )}
+        {!craneData && !loading && (
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16,marginTop:8}}>
+            {[{icon:"📊",title:"SWL Charts",desc:"Auto-extract load vs radius curves"},{icon:"⚙️",title:"Technical Specs",desc:"Speeds, power, duty cycle, dimensions"},{icon:"📜",title:"Certificates",desc:"Safety devices and certifications"}].map((f,i)=>(
+              <div key={i} className="dark-card" style={{padding:"18px",textAlign:"center"}}>
+                <div style={{fontSize:32,marginBottom:10}}>{f.icon}</div>
+                <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:"#94a3b8",letterSpacing:1,marginBottom:6}}>{f.title}</div>
+                <div style={{fontSize:11,color:"#475569",fontFamily:"var(--font-mono)"}}>{f.desc}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </LeaTabShell>
+  );
+}
+
+// ─── TAB: ACCESSORIES LIBRARY ─────────────────────────────────────────────────
+function AccessoriesTab() {
+  const [accCategory, setAccCategory] = useState("wireSlings");
+  const [accGrade, setAccGrade] = useState(null);
+  const [expandedDims, setExpandedDims] = useState(false);
+
+  useEffect(()=>{ const cat=LEEA_DATA[accCategory]; if(cat) setAccGrade(Object.keys(cat.grades)[0]); },[accCategory]);
+
+  return (
+    <LeaTabShell>
+      <div className="fade-in">
+        <div style={{marginBottom:18}}>
+          <h2 style={{fontFamily:"var(--font-display)",fontSize:22,fontWeight:800,color:"#f59e0b",margin:0,letterSpacing:2}}>LIFTING ACCESSORIES LIBRARY</h2>
+          <p style={{color:"#64748b",fontSize:12,margin:"4px 0 0",letterSpacing:1,fontFamily:"var(--font-mono)"}}>LEEA-compliant SWL tables and dimension data — EN13414 · EN818 · EN1492 · EN13889</p>
+        </div>
+        <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:20}}>
+          {Object.entries(LEEA_DATA).map(([key,cat])=>(
+            <button key={key} className={`acc-pill ${accCategory===key?"active":""}`} onClick={()=>setAccCategory(key)}>
+              {cat.icon} {cat.label}
+            </button>
+          ))}
+        </div>
+        {accCategory && LEEA_DATA[accCategory] && (
+          <div>
+            <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16,flexWrap:"wrap"}}>
+              <label style={{color:"#64748b",fontSize:11,letterSpacing:2,whiteSpace:"nowrap",fontFamily:"var(--font-mono)"}}>GRADE / STANDARD:</label>
+              <div style={{flex:1,minWidth:280}}>
+                <select value={accGrade||""} onChange={e=>setAccGrade(e.target.value)}
+                  style={{background:"#0d1f35",border:"1px solid #1e3a5f",color:"#e2e8f0",borderRadius:4,padding:"6px 10px",fontFamily:"var(--font-mono)",fontSize:13,width:"100%",cursor:"pointer"}}>
+                  {Object.keys(LEEA_DATA[accCategory].grades).map(g=><option key={g} value={g}>{g}</option>)}
+                </select>
+              </div>
+            </div>
+            {accGrade && LEEA_DATA[accCategory].grades[accGrade] && (
+              <div className="fade-in">
+                <div style={{background:"#071520",border:"1px solid #0c3a5e",borderLeft:"3px solid #22d3ee",borderRadius:"0 8px 8px 0",padding:"10px 16px",marginBottom:16,fontSize:12,color:"#7dd3fc",fontFamily:"var(--font-mono)"}}>
+                  ℹ️ {LEEA_DATA[accCategory].grades[accGrade].info}
+                </div>
+                <div className="dark-card" style={{marginBottom:16}}>
+                  <div className="dark-card-header">
+                    <span className="dark-section-label">📋 SAFE WORKING LOADS — {accGrade}</span>
+                    <span style={{fontSize:10,color:"#475569",fontFamily:"var(--font-mono)"}}>Factor of Safety 4:1 (LEEA)</span>
+                  </div>
+                  <div style={{overflowX:"auto"}}>
+                    <table className="dark-table">
+                      <thead>
+                        <tr>{LEEA_DATA[accCategory].columns.map((col,i)=><th key={i} style={{textAlign:i===0?"left":"right"}}>{col}</th>)}</tr>
+                      </thead>
+                      <tbody>
+                        {LEEA_DATA[accCategory].grades[accGrade].rows.map((row,i)=>{
+                          const keys=LEEA_DATA[accCategory].keys;
+                          return (
+                            <tr key={i}>
+                              {keys.map((k,j)=>(
+                                <td key={j} style={{textAlign:j===0?"left":"right",color:j===0?"#e2e8f0":j===1?"#22d3ee":"#94a3b8",fontWeight:j<=1?700:400}}>
+                                  {typeof row[k]==="number"?row[k]:row[k]??"—"}
+                                </td>
+                              ))}
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div className="dark-card" style={{marginBottom:16}}>
+                  <div className="dark-card-header" style={{cursor:"pointer"}} onClick={()=>setExpandedDims(!expandedDims)}>
+                    <span className="dark-section-label">📐 DIMENSIONS & INSPECTION NOTES</span>
+                    <span style={{color:"#475569",fontSize:18,transform:expandedDims?"rotate(90deg)":"none",transition:"transform 0.2s"}}>›</span>
+                  </div>
+                  {expandedDims && (
+                    <div className="fade-in" style={{padding:"14px 18px"}}>
+                      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))",gap:10,marginBottom:14}}>
+                        {LEEA_DATA[accCategory].dimensions.items.map((dim,i)=>(
+                          <div key={i} style={{background:"#0a1628",border:"1px solid #1e3a5f",borderRadius:6,padding:"10px 12px"}}>
+                            <div style={{fontSize:9,color:"#475569",letterSpacing:2,marginBottom:4,fontFamily:"var(--font-mono)"}}>DIM {String.fromCharCode(65+i)}</div>
+                            <div style={{fontSize:12,color:"#94a3b8",fontFamily:"var(--font-mono)"}}>{dim}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{background:"#07111f",border:"1px solid #7c2d12",borderLeft:"3px solid #f59e0b",borderRadius:"0 6px 6px 0",padding:"10px 14px",fontSize:11,color:"#fbbf24",fontFamily:"var(--font-mono)"}}>
+                        ⚠️ {LEEA_DATA[accCategory].dimensions.note}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="dark-card" style={{padding:"14px 18px"}}>
+                  <div className="dark-section-label" style={{marginBottom:12}}>📐 SLING ANGLE MODE FACTORS (Multi-leg)</div>
+                  <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
+                    {[{angle:"0°",factor:1.0,label:"Vertical"},{angle:"30°",factor:0.966,label:"30° from vert."},{angle:"45°",factor:0.707,label:"45° from vert."},{angle:"60°",factor:0.577,label:"60° from vert."}].map(m=>(
+                      <div key={m.angle} style={{background:"#0a1628",border:"1px solid #1e3a5f",borderRadius:8,padding:"12px 18px",textAlign:"center",flex:1,minWidth:100}}>
+                        <div style={{fontFamily:"var(--font-display)",fontSize:22,fontWeight:800,color:"#22d3ee"}}>{m.factor}</div>
+                        <div style={{fontSize:11,color:"#f59e0b",fontWeight:700,marginBottom:2,fontFamily:"var(--font-mono)"}}>{m.angle}</div>
+                        <div style={{fontSize:10,color:"#475569",fontFamily:"var(--font-mono)"}}>{m.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </LeaTabShell>
+  );
+}
+
+// ─── LIFT DIAGRAM SVG ─────────────────────────────────────────────────────────
+function LiftDiagram({ legs, angleDeg, load, tension, swl }) {
+  const W=340, H=320, cx=W/2, hookY=52;
+  const loadW=100, loadH=44, loadY=H-60;
+  const overload = tension>swl && swl>0;
+  const nearLimit = tension>swl*0.85 && swl>0;
+  const statusColor = overload?"#ef4444":nearLimit?"#f59e0b":"#22d3ee";
+  const angleRad = (angleDeg*Math.PI)/180;
+  const spreadX = Math.sin(angleRad)*(loadY-hookY-20);
+  const attachY = loadY-14;
+  const legPoints = legs===1?[{x:cx,y:attachY}]:legs===2?[{x:cx-spreadX,y:attachY},{x:cx+spreadX,y:attachY}]:legs===3?[{x:cx,y:attachY},{x:cx-spreadX*0.87,y:attachY},{x:cx+spreadX*0.87,y:attachY}]:[{x:cx-spreadX,y:attachY},{x:cx+spreadX,y:attachY},{x:cx-spreadX*0.5,y:attachY},{x:cx+spreadX*0.5,y:attachY}];
+  const legColor = overload?"#ef4444":"#f59e0b";
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{maxHeight:320}}>
+      <defs>
+        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e3a5f" strokeWidth="0.5"/></pattern>
+        <filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <rect width={W} height={H} fill="#0a1628" rx="8"/>
+      <rect width={W} height={H} fill="url(#grid)" rx="8"/>
+      <rect x={cx-70} y={10} width={140} height={18} rx="3" fill="#1e3a5f" stroke="#334e7a" strokeWidth="1"/>
+      <rect x={cx-2} y={28} width={4} height={hookY-28} fill="#334e7a"/>
+      <circle cx={cx} cy={hookY} r={10} fill="#1e3a5f" stroke={statusColor} strokeWidth="2" filter="url(#glow)"/>
+      <path d={`M ${cx} ${hookY-4} Q ${cx+10} ${hookY} ${cx+4} ${hookY+8}`} fill="none" stroke={statusColor} strokeWidth="2.5" strokeLinecap="round"/>
+      {legPoints.map((pt,i)=>(
+        <g key={i}>
+          <line x1={cx} y1={hookY+10} x2={pt.x} y2={pt.y} stroke={legColor} strokeWidth="2.5" strokeDasharray={overload?"6,3":"none"}/>
+          {legs>1&&<text x={(cx+pt.x)/2+(i%2===0?-28:12)} y={(hookY+pt.y)/2} fill="#94a3b8" fontSize="10" fontFamily="monospace">{tension.toFixed(2)}t</text>}
+        </g>
+      ))}
+      {legs>1&&<text x={cx-55} y={hookY+70} fill="#64748b" fontSize="10" fontFamily="monospace">{angleDeg}° from vert.</text>}
+      <rect x={cx-loadW/2} y={loadY} width={loadW} height={loadH} rx="4" fill="#132237" stroke="#1e3a5f" strokeWidth="2"/>
+      <text x={cx} y={loadY+loadH/2+5} textAnchor="middle" fill="#e2e8f0" fontSize="13" fontWeight="bold" fontFamily="monospace">{load} t</text>
+      <rect x={cx-55} y={4} width={110} height={22} rx="4" fill={overload?"#3b1010":nearLimit?"#3b2a00":"#0a2a1e"} stroke={statusColor} strokeWidth="1"/>
+      <text x={cx} y={19} textAnchor="middle" fill={statusColor} fontSize="11" fontWeight="bold" fontFamily="monospace">{overload?"⚠ OVERLOAD":nearLimit?"⚠ NEAR LIMIT":"✓ WITHIN SWL"}</text>
+    </svg>
+  );
+}
+
+// ─── TAB: LOAD CALCULATOR ─────────────────────────────────────────────────────
+function LoadCalculatorTab() {
+  const [loadWeight, setLoadWeight]   = useState(5.0);
+  const [numLegs, setNumLegs]         = useState(2);
+  const [slingAngle, setSlingAngle]   = useState(45);
+  const [slingType, setSlingType]     = useState("wireSlings");
+  const [slingGrade, setSlingGrade]   = useState("6x19 IWRC - Grade 1770");
+  const [slingSizeIdx, setSlingSizeIdx] = useState(3);
+  const [dynFactor, setDynFactor]     = useState(1.0);
+
+  const angleRad   = (slingAngle*Math.PI)/180;
+  const modeFactor = Math.cos(angleRad);
+  const tensionPerLeg = numLegs>1 ? (loadWeight*dynFactor)/(numLegs*modeFactor) : loadWeight*dynFactor;
+  const selectedSlingData = LEEA_DATA[slingType]?.grades[slingGrade]?.rows||[];
+  const selectedSlingRow  = selectedSlingData[slingSizeIdx]||null;
+  const slingSwl   = selectedSlingRow ? selectedSlingRow.swl1 : 0;
+  const utilisation = slingSwl>0 ? (tensionPerLeg/slingSwl)*100 : 0;
+  const overload   = utilisation>100;
+  const nearLimit  = utilisation>85;
+  const utilizationColor = overload?"#ef4444":nearLimit?"#f59e0b":"#22d3ee";
+
+  const inputStyle = {background:"#0d1f35",border:"1px solid #1e3a5f",color:"#e2e8f0",borderRadius:4,padding:"6px 10px",fontFamily:"var(--font-mono)",fontSize:13,width:"100%"};
+
+  return (
+    <LeaTabShell>
+      <div className="fade-in">
+        <div style={{marginBottom:18}}>
+          <h2 style={{fontFamily:"var(--font-display)",fontSize:22,fontWeight:800,color:"#f59e0b",margin:0,letterSpacing:2}}>INTERACTIVE LOAD CALCULATOR</h2>
+          <p style={{color:"#64748b",fontSize:12,margin:"4px 0 0",letterSpacing:1,fontFamily:"var(--font-mono)"}}>Dynamic sling tension and utilisation — LEEA / BS EN standards</p>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"350px 1fr",gap:20,alignItems:"start"}}>
+          {/* Input Panel */}
+          <div className="dark-card" style={{padding:"20px"}}>
+            <div className="dark-section-label" style={{marginBottom:18}}>⚙️ LIFT PARAMETERS</div>
+            <div style={{marginBottom:16}}>
+              <label style={{display:"block",fontSize:10,color:"#475569",letterSpacing:2,marginBottom:6,fontFamily:"var(--font-mono)"}}>LOAD WEIGHT (t)</label>
+              <input type="number" min="0.1" max="500" step="0.1" value={loadWeight} onChange={e=>setLoadWeight(parseFloat(e.target.value)||0)} style={inputStyle}/>
+            </div>
+            <div style={{marginBottom:16}}>
+              <label style={{display:"block",fontSize:10,color:"#475569",letterSpacing:2,marginBottom:6,fontFamily:"var(--font-mono)"}}>DYNAMIC FACTOR — {dynFactor.toFixed(2)}×</label>
+              <input type="range" min="1.0" max="2.0" step="0.05" value={dynFactor} onChange={e=>setDynFactor(parseFloat(e.target.value))} style={{width:"100%",accentColor:"#f59e0b"}}/>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"#334e7a",marginTop:2,fontFamily:"var(--font-mono)"}}>
+                <span>1.0 Static</span><span>1.3 Slow</span><span>2.0 Dynamic</span>
+              </div>
+            </div>
+            <div style={{marginBottom:16}}>
+              <label style={{display:"block",fontSize:10,color:"#475569",letterSpacing:2,marginBottom:8,fontFamily:"var(--font-mono)"}}>NUMBER OF SLING LEGS</label>
+              <div style={{display:"flex",gap:8}}>
+                {[1,2,3,4].map(n=>(
+                  <button key={n} onClick={()=>setNumLegs(n)} style={{flex:1,padding:"10px 4px",background:numLegs===n?"#0d2240":"#0a1628",border:`1px solid ${numLegs===n?"#f59e0b":"#1e3a5f"}`,color:numLegs===n?"#f59e0b":"#64748b",borderRadius:6,cursor:"pointer",fontFamily:"var(--font-display)",fontWeight:800,fontSize:18}}>{n}</button>
+                ))}
+              </div>
+            </div>
+            {numLegs>1 && (
+              <div style={{marginBottom:16}}>
+                <label style={{display:"block",fontSize:10,color:"#475569",letterSpacing:2,marginBottom:6,fontFamily:"var(--font-mono)"}}>SLING ANGLE FROM VERTICAL — {slingAngle}°</label>
+                <input type="range" min="0" max="60" step="5" value={slingAngle} onChange={e=>setSlingAngle(parseInt(e.target.value))} style={{width:"100%",accentColor:"#f59e0b"}}/>
+                <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"#334e7a",marginTop:2,fontFamily:"var(--font-mono)"}}>
+                  <span>0° Ideal</span><span>30°</span><span>45° Std</span><span>60° Max</span>
+                </div>
+              </div>
+            )}
+            <div style={{borderTop:"1px solid #1e3a5f",paddingTop:16,marginTop:4}}>
+              <div className="dark-section-label" style={{fontSize:12,marginBottom:12}}>SELECT SLING FOR VERIFICATION</div>
+              <div style={{marginBottom:10}}>
+                <label style={{display:"block",fontSize:10,color:"#475569",letterSpacing:2,marginBottom:4,fontFamily:"var(--font-mono)"}}>SLING TYPE</label>
+                <select value={slingType} onChange={e=>{setSlingType(e.target.value);setSlingGrade(Object.keys(LEEA_DATA[e.target.value].grades)[0]);setSlingSizeIdx(0);}} style={{...inputStyle,cursor:"pointer"}}>
+                  {Object.entries(LEEA_DATA).map(([k,v])=><option key={k} value={k}>{v.icon} {v.label}</option>)}
+                </select>
+              </div>
+              <div style={{marginBottom:10}}>
+                <label style={{display:"block",fontSize:10,color:"#475569",letterSpacing:2,marginBottom:4,fontFamily:"var(--font-mono)"}}>GRADE</label>
+                <select value={slingGrade} onChange={e=>{setSlingGrade(e.target.value);setSlingSizeIdx(0);}} style={{...inputStyle,cursor:"pointer"}}>
+                  {Object.keys(LEEA_DATA[slingType].grades).map(g=><option key={g} value={g}>{g}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{display:"block",fontSize:10,color:"#475569",letterSpacing:2,marginBottom:4,fontFamily:"var(--font-mono)"}}>SIZE</label>
+                <select value={slingSizeIdx} onChange={e=>setSlingSizeIdx(parseInt(e.target.value))} style={{...inputStyle,cursor:"pointer"}}>
+                  {(LEEA_DATA[slingType]?.grades[slingGrade]?.rows||[]).map((row,i)=>{
+                    const keyFirst=LEEA_DATA[slingType].keys[0];
+                    return <option key={i} value={i}>{row[keyFirst]}</option>;
+                  })}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Results Panel */}
+          <div>
+            <div className="dark-card" style={{padding:"12px",marginBottom:16}}>
+              <LiftDiagram legs={numLegs} angleDeg={slingAngle} load={loadWeight*dynFactor} tension={tensionPerLeg} swl={slingSwl}/>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12,marginBottom:16}}>
+              <div className="dark-card" style={{padding:"16px 18px"}}>
+                <div style={{fontSize:10,color:"#475569",letterSpacing:2,marginBottom:8,fontFamily:"var(--font-mono)"}}>⬆️ TENSION PER LEG</div>
+                <div style={{fontFamily:"var(--font-display)",fontSize:36,fontWeight:800,color:"#22d3ee",lineHeight:1}}>{tensionPerLeg.toFixed(3)}</div>
+                <div style={{fontSize:11,color:"#475569",fontFamily:"var(--font-mono)"}}>tonnes</div>
+              </div>
+              <div className="dark-card" style={{padding:"16px 18px"}}>
+                <div style={{fontSize:10,color:"#475569",letterSpacing:2,marginBottom:8,fontFamily:"var(--font-mono)"}}>🎯 SLING SWL</div>
+                <div style={{fontFamily:"var(--font-display)",fontSize:36,fontWeight:800,color:"#f59e0b",lineHeight:1}}>{slingSwl>0?slingSwl.toFixed(2):"—"}</div>
+                <div style={{fontSize:11,color:"#475569",fontFamily:"var(--font-mono)"}}>tonnes 1-leg</div>
+              </div>
+            </div>
+            <div className="dark-card" style={{border:`1px solid ${utilizationColor}`,padding:"16px 18px",marginBottom:16}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                <span style={{fontFamily:"var(--font-display)",fontSize:13,fontWeight:700,color:"#94a3b8",letterSpacing:2}}>UTILISATION</span>
+                <span style={{fontFamily:"var(--font-display)",fontSize:28,fontWeight:800,color:utilizationColor}}>{slingSwl>0?`${utilisation.toFixed(1)}%`:"N/A"}</span>
+              </div>
+              <div style={{height:14,background:"#0a1628",borderRadius:7,overflow:"hidden"}}>
+                <div style={{height:14,borderRadius:7,width:`${Math.min(utilisation,100)}%`,background:utilizationColor,transition:"width 0.4s ease, background 0.3s",boxShadow:`0 0 12px ${utilizationColor}88`}}/>
+              </div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"#334e7a",marginTop:4,fontFamily:"var(--font-mono)"}}>
+                <span>0%</span><span style={{color:"#f59e0b"}}>85% Advisory</span><span style={{color:"#ef4444"}}>100% LIMIT</span>
+              </div>
+            </div>
+            <div className="dark-card" style={{padding:"16px 18px"}}>
+              <div className="dark-section-label" style={{fontSize:12,marginBottom:12}}>📊 CALCULATION BREAKDOWN</div>
+              {[
+                {label:"Load Weight",      value:`${loadWeight} t`},
+                {label:"Dynamic Factor",   value:`×${dynFactor.toFixed(2)}`},
+                {label:"Design Load",      value:`${(loadWeight*dynFactor).toFixed(3)} t`},
+                {label:"No. Legs",         value:`${numLegs}`},
+                ...(numLegs>1?[{label:"Angle from Vertical",value:`${slingAngle}°`},{label:"Mode Factor (cos θ)",value:`${modeFactor.toFixed(4)}`}]:[]),
+                {label:"Tension per Leg",  value:`${tensionPerLeg.toFixed(4)} t`, highlight:true},
+                {label:"Selected Sling SWL", value:`${slingSwl} t`, highlight:true},
+                {label:"Utilisation",      value:`${slingSwl>0?utilisation.toFixed(1):"N/A"}%`, highlight:true},
+              ].map((row,i)=>(
+                <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 0",borderBottom:"1px solid #0d1a2e",...(row.highlight?{marginTop:4,paddingTop:10,borderTop:"1px solid #1e3a5f"}:{})}}>
+                  <span style={{fontSize:11,color:"#64748b",fontFamily:"var(--font-mono)"}}>{row.label}</span>
+                  <span style={{fontSize:12,fontWeight:700,color:row.highlight?"#f59e0b":"#94a3b8",fontFamily:"var(--font-mono)"}}>{row.value}</span>
+                </div>
+              ))}
+            </div>
+            {overload && (
+              <div className="fade-in" style={{background:"#1a0505",border:"1px solid #ef4444",borderRadius:8,padding:"12px 16px",marginTop:14,fontSize:12,color:"#fca5a5",fontFamily:"var(--font-mono)"}}>
+                ⛔ <strong>OVERLOAD CONDITION</strong> — Tension per leg exceeds sling SWL. Increase sling size, add legs, or reduce angle.
+              </div>
+            )}
+            {nearLimit && !overload && (
+              <div className="fade-in" style={{background:"#1a1000",border:"1px solid #f59e0b",borderRadius:8,padding:"12px 16px",marginTop:14,fontSize:12,color:"#fcd34d",fontFamily:"var(--font-mono)"}}>
+                ⚠️ <strong>APPROACHING LIMIT</strong> — Utilisation above 85%. Review dynamic factors and consider a higher-rated sling.
+              </div>
+            )}
           </div>
         </div>
-        <div class="author-links">
-          <a href="https://linkedin.com/in/mahmoud-galal-0a771a146" target="_blank" class="author-link">💼 LinkedIn</a>
-          <a href="https://github.com/YOUR_USERNAME/liftplan-pro" target="_blank" class="author-link">⭐ GitHub</a>
-        </div>
       </div>
+    </LeaTabShell>
+  );
+}
 
-      <div class="disclaimer">
-        ⚠️ DISCLAIMER — This application is a technical reference and planning aid only. All lifting operations must be planned by a competent Appointed Person under LOLER 1998,
-        verified against the actual manufacturer's certified load chart on site, and conducted under qualified supervision with all applicable permits to work.
-        Load chart data is indicative and must never substitute certified manufacturer documentation.
-      </div>
-    </div>
-  </section>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-left">LIFTPLAN PRO · MIT LICENCE · OPEN SOURCE</div>
-    <div class="footer-right">
-      <span class="footer-badge">LOLER 1998</span>
-      <span class="footer-badge">BS 7121</span>
-      <span class="footer-badge">LEEA</span>
-      <span class="footer-badge">EN 13414</span>
-    </div>
-  </footer>
-
+    // Mount the app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(App));
+  </script>
 </body>
 </html>
