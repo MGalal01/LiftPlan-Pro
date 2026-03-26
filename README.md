@@ -200,9 +200,9 @@ MIT Licence — free to use, modify and distribute. Attribution appreciated.
 
 ## 👤 Author
 
-**Mahmoud Elsayed** — Mechanical Engineer · Lifting Equipment Specialist  
-LEEA-AP-04421 · CMIOSH · CFD / ANSYS Fluent  
-[GitHub](https://github.com/YOUR_USERNAME) · [LinkedIn](https://linkedin.com/in/YOUR_PROFILE)
+**Mahmoud Elsayed** — Mechanical Engineer · APLO (LEEA) 
+
+[LinkedIn](https://www.linkedin.com/in/mahmoud-galal-0a771a146/)
 
 ---
 
